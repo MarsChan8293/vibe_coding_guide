@@ -24,8 +24,10 @@ jobs:
         with:
           args: >-
             --no-progress
-            --accept 200,429
-            --exclude '^/vibe_coding_guide/'
+            --accept '200..=299,429'
             --exclude '^https://marschan8293\.github\.io/vibe_coding_guide/'
-            './dist/**/*.html'
+            'README.md'
+            './src/content/**/*.mdx'
+            './src/pages/resources.astro'
+            './src/components/Footer.astro'
           fail: true
