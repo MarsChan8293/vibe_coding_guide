@@ -24,10 +24,13 @@ const { events } = Astro.props;
 <ol class="timeline" aria-label="2025 年至今的 Vibe Coding 时间轴">
   {events.map((event, index) => (
     <li>
+      <div class="event-rail">
+        <span class="event-index">{String(index + 1).padStart(2, "0")}</span>
+        <time class="event-date">{event.date}</time>
+      </div>
+      <span class="event-node" aria-hidden="true"></span>
       <details open={index === 1 || index === events.length - 1}>
         <summary>
-          <span class="event-index">{String(index + 1).padStart(2, "0")}</span>
-          <span class="event-date">{event.date}</span>
           <strong>{event.title}</strong>
           <span class="event-concept">{event.concept}</span>
         </summary>
@@ -57,52 +60,90 @@ const { events } = Astro.props;
 <style>
   .timeline {
     display: grid;
-    margin: 3rem 0;
+    width: min(960px, calc(100vw - 3rem));
+    margin: 4rem 0;
     padding: 0;
-    gap: 0;
     list-style: none;
   }
 
   .timeline li {
     position: relative;
-    padding-left: 3rem;
+    display: grid;
+    min-width: 0;
+    grid-template-columns: 9.5rem 2.5rem minmax(0, 1fr);
+    padding-bottom: 2rem;
   }
 
   .timeline li::before {
     position: absolute;
     top: 0;
     bottom: 0;
-    left: .65rem;
-    width: 2px;
+    left: 10.7rem;
+    width: 1px;
     content: "";
-    background: var(--ink);
+    background: var(--line);
   }
 
-  .timeline li::after {
-    position: absolute;
-    top: 1.55rem;
-    left: .25rem;
-    width: .85rem;
-    height: .85rem;
-    border: 2px solid var(--paper);
+  .timeline li:first-child::before {
+    top: 1.5rem;
+  }
+
+  .timeline li:last-child {
+    padding-bottom: 0;
+  }
+
+  .timeline li:last-child::before {
+    bottom: auto;
+    height: 1.5rem;
+  }
+
+  .event-rail {
+    display: grid;
+    align-content: start;
+    justify-items: end;
+    padding: .75rem 1.2rem 0 0;
+    text-align: right;
+  }
+
+  .event-index {
+    color: var(--red);
+    font: 760 2.35rem/1 var(--serif);
+  }
+
+  .event-date {
+    margin-top: .45rem;
+    color: var(--muted);
+    font: 650 .72rem/1.5 var(--mono);
+    white-space: nowrap;
+  }
+
+  .event-node {
+    z-index: 1;
+    display: block;
+    width: .95rem;
+    height: .95rem;
+    margin-top: 1.05rem;
+    place-self: start center;
+    border: 3px solid var(--paper);
     border-radius: 50%;
-    content: "";
     background: var(--red);
     box-shadow: 0 0 0 1px var(--red);
   }
 
   details {
-    margin-bottom: 1.2rem;
+    min-width: 0;
     border: 1px solid var(--line);
     background: rgba(255,255,255,.23);
+    box-shadow: 6px 6px 0 rgba(24, 24, 21, .045);
   }
 
   summary {
     display: grid;
-    grid-template-columns: 2.6rem 8rem 1fr auto;
+    min-height: 108px;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
+    gap: .55rem 1.25rem;
+    padding: 1.25rem 1.4rem;
     cursor: pointer;
     list-style: none;
   }
@@ -112,7 +153,7 @@ const { events } = Astro.props;
   }
 
   summary::after {
-    grid-column: 4;
+    grid-column: 2;
     grid-row: 1;
     content: "+";
     font: 500 1.5rem/1 var(--mono);
@@ -122,36 +163,45 @@ const { events } = Astro.props;
     content: "−";
   }
 
-  .event-index,
-  .event-date,
   .event-concept {
     font-family: var(--mono);
   }
 
-  .event-index {
-    color: var(--red);
-    font-size: .72rem;
-  }
-
-  .event-date {
-    font-size: .72rem;
-  }
-
   summary strong {
+    min-width: 0;
     font-family: var(--serif);
-    font-size: 1.15rem;
+    font-size: clamp(1.2rem, 2vw, 1.55rem);
+    line-height: 1.25;
+    text-wrap: balance;
   }
 
   .event-concept {
-    grid-column: 3;
-    margin-top: -.5rem;
+    grid-column: 1;
+    grid-row: 2;
     color: var(--muted);
-    font-size: .68rem;
+    font-size: .7rem;
+    line-height: 1.6;
   }
 
   .event-body {
-    padding: 0 1.25rem 1.4rem 12.6rem;
+    padding: .2rem 1.4rem 1.4rem;
     border-top: 1px solid var(--soft-line);
+  }
+
+  details[open] .event-body {
+    animation: reveal .22s ease-out;
+  }
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   dl {
@@ -177,85 +227,62 @@ const { events } = Astro.props;
     font: 650 .7rem/1.4 var(--mono);
   }
 
-  @media (min-width: 1040px) {
+  @media (max-width: 680px) {
     .timeline {
-      width: calc(100vw - 7rem);
-      max-width: 1280px;
-      grid-template-columns: repeat(4, minmax(235px, 1fr));
-      gap: 1rem;
-      transform: translateX(-7rem);
+      width: 100%;
+      margin-block: 3rem;
     }
 
     .timeline li {
-      padding: 2.3rem 0 0;
+      grid-template-columns: 1.5rem minmax(0, 1fr);
+      padding-bottom: 1.75rem;
     }
 
     .timeline li::before {
-      top: .7rem;
-      right: -1rem;
-      bottom: auto;
-      left: 0;
-      width: auto;
-      height: 2px;
+      left: .45rem;
     }
 
-    .timeline li::after {
-      top: .25rem;
-      left: 0;
+    .event-rail {
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      align-items: baseline;
+      justify-content: start;
+      gap: .7rem;
+      padding: 0 0 .65rem;
+      text-align: left;
+    }
+
+    .event-index {
+      font-size: 1.65rem;
+    }
+
+    .event-date {
+      margin-top: 0;
+    }
+
+    .event-node {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      margin-top: .38rem;
+    }
+
+    details {
+      grid-column: 2;
+      grid-row: 2;
     }
 
     summary {
-      min-height: 190px;
-      grid-template-columns: 1fr auto;
-      align-content: start;
-    }
-
-    .event-date,
-    summary strong,
-    .event-concept {
-      grid-column: 1 / -1;
-    }
-
-    summary strong {
-      margin-top: .5rem;
-      font-size: 1.35rem;
-    }
-
-    .event-concept {
-      margin-top: .1rem;
-    }
-
-    .event-body {
+      min-height: 0;
       padding: 1rem;
     }
 
-    dl {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 680px) {
-    .timeline li {
-      padding-left: 2rem;
-    }
-
-    summary {
-      grid-template-columns: 2rem 1fr auto;
-      gap: .55rem;
-    }
-
-    .event-date,
-    summary strong,
-    .event-concept {
-      grid-column: 2 / 4;
-    }
-
     summary strong {
-      font-size: 1rem;
+      font-size: 1.08rem;
     }
 
     .event-body {
-      padding: 0 1rem 1rem;
+      padding: .15rem 1rem 1rem;
     }
 
     dl {
