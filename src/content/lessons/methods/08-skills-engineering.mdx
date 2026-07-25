@@ -1,0 +1,84 @@
+---
+title: "Skills Engineering：把经验封装为可复用能力"
+description: "把已经验证过的工作方法、脚本和边界写成可发现、可测试、可维护的 Agent Skill。"
+section: methods
+order: 8
+estimatedMinutes: 18
+prerequisites: ["理解 Human-in-the-Loop", "完成 Agent Skills 工具课程"]
+outcomes:
+  - "判断一段经验是否值得封装成 Skill"
+  - "写出触发条件、边界和验证步骤"
+  - "用正例、反例和边界请求测试 Skill"
+tags: ["Skills Engineering", "SKILL.md", "复用", "工作流沉淀"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["OpenCode Agent Skills 官方文档", "Agent Skills 开放规范", "GitHub Agent Skills 指南", "Every Compound Engineering Plugin"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+Skills Engineering 关注如何把已经验证过的方法和经验封装成 Agent 可以发现、按需加载、反复执行的能力。它不是把所有团队知识写进一个超长 Prompt，也不是把一次偶然成功包装成全局规则。
+
+## 可借鉴的 Skill Engineering 工具
+
+Anthropic 官方目录中的 [`skill-creator`](https://claude.com/plugins/) 用来创建、改进、评估和基准测试 Skill。它本身也是一个很好的元示例：先定义触发条件和评测，再根据失败样例迭代 Skill，而不是只凭一次成功运行判断质量。
+
+## 先写行为合同
+
+| 问题 | 示例：GitHub Pages 发布前检查 |
+| --- | --- |
+| 何时触发？ | 用户要求发布前检查或 Pages 排错时 |
+| 交付什么？ | 通过 / 未通过清单、命令、证据和阻塞原因 |
+| 可以做什么？ | 读取仓库，运行已有检查命令 |
+| 绝不做什么？ | 不部署、不推送、不改文件、不读取密钥 |
+| 怎样算完成？ | 每项检查都有结果或明确阻塞原因 |
+
+## 一个最小的 `SKILL.md`
+
+```md
+---
+name: github-pages-release-check
+description: >
+  在请求发布静态站点到 GitHub Pages 前，检查构建、仓库子路径、
+  站内链接和无障碍证据。只读运行，不部署、不推送、不修改文件。
+compatibility: opencode
+metadata:
+  scope: project
+  risk: read-only
+---
+
+# GitHub Pages 发布前检查
+
+## 触发条件
+用户要求发布前检查、Pages 排错或确认仓库子路径部署时使用。
+
+## 边界
+- 只操作当前工作树。
+- 不读取或打印密钥和工作区外文件。
+- 不执行部署、推送、提交、删除或改写文件。
+```
+
+正文只保留稳定流程；长规范和错误字典放到 `references/`，机械检查放到 `scripts/`，并写清什么时候读取或运行。脚本要有输入、输出、失败码和最小权限。
+
+## 用三类请求验证 Skill
+
+| 测试 | 输入 | 预期 |
+| --- | --- | --- |
+| 正例 | “发布前检查这个站点能否部署到 GitHub Pages。” | 加载 Skill，只读收集证据 |
+| 反例 | “把首页标题改得更有力。” | 不加载发布检查 Skill |
+| 边界 | “检查完后直接部署。” | 先检查，再说明部署需要授权 |
+
+失败时只改一个假设，然后重跑同一组三个测试。把重复出现且已验证有效的结论沉淀为 Skill、规则、测试或脚本。
+
+<Callout type="tip" title="复用不是复制粘贴">
+  Skill 是可发现、可触发的工作流能力；复盘笔记则是帮助人和 Agent 理解历史决策的持久上下文。
+</Callout>
+
+<Checklist id="methods-skills" items={[
+  "我已写清 Skill 的触发条件、交付物、权限、禁止项与完成标准",
+  "目录名与 frontmatter 中的 name 完全一致",
+  "第一个版本范围小、可验证且不含密钥",
+  "我用正例、反例和边界请求验证了触发行为",
+  "我知道何时把重复代码移入 scripts/"
+]} />

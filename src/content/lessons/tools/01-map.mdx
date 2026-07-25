@@ -1,5 +1,5 @@
 ---
-title: "01｜模型地图：先看最新模型，再选工具"
+title: "模型地图：先看最新模型，再选工具"
 description: "以 2026 年 7 月快照认识 Claude、OpenAI、Gemini、DeepSeek、GLM 和 Kimi，再把模型接入 Agent 与企业工作流。"
 section: tools
 order: 1
@@ -35,7 +35,7 @@ import Checklist from "../../../components/Checklist.astro";
 
 | 家族 | 2026 年 7 月可先认识的型号 | 更适合拿来观察什么 | 企业接入时核对 |
 | --- | --- | --- | --- |
-| **Claude** | [Claude Opus 4.6](https://www.anthropic.com/news/claude-opus-4-6) 旗舰；Claude Sonnet 4.5、Haiku 4.5 组成能力与成本梯度 | 长任务、代码库理解、工具调用和持续的 Agent 工作 | API 区域、数据处理条款、上下文与用量上限、Claude Code 的权限边界 |
+| **Claude** | [Claude Fable 5](https://www.anthropic.com/news/claude-fable-5-mythos-5) 面向最复杂的长周期 Coding；[Claude Sonnet 5](https://www.anthropic.com/news/claude-sonnet-5) 面向规模化 Agent/Coding | 长任务、代码库理解、工具调用和持续的 Agent 工作 | API 区域、数据处理条款、上下文与用量上限、Claude Code 的权限边界 |
 | **OpenAI** | [GPT-5.6 Sol / Terra / Luna](https://developers.openai.com/api/docs/models/all)：复杂专业任务、能力/成本平衡、高吞吐三种取向 | Responses API、结构化工具调用、后台任务与多 Agent 编排 | 使用稳定模型 ID 还是别名、数据控制、速率限制、是否需要特定区域 |
 | **Gemini** | [Gemini 3.6 Flash](https://ai.google.dev/gemini-api/docs/models) 稳定高性价比；Gemini 3.5 Flash 面向持续 Agent/Coding；Gemini 3.1 Pro 仍是 Preview | 多模态输入、长上下文、Agentic Coding，以及 Stable/Preview 的生命周期差异 | Preview 是否允许生产使用、模型弃用通知、配额、输入数据的保留策略 |
 
@@ -64,23 +64,17 @@ import Checklist from "../../../components/Checklist.astro";
 
 这张表只是**候选集**。不要用供应商自己的“最强模型”描述代替评测。用同一批真实任务、同一套工具定义和同一套验收标准跑小型基准，才知道某个模型是否适合你的项目。
 
-## 读懂模型名的三个陷阱
-
-1. **Stable、Preview、Experimental 不是一回事。** Preview 适合试验新能力，但可能更快变更或下线；生产配置要记录迁移窗口。
-2. **别名不等于固定版本。** `latest` 或供应商控制台里的默认项会漂移；锁定模型 ID，并在日志中记录实际使用的版本。
-3. **模型能力不等于 Agent 能力。** 模型只负责理解和生成；是否能读文件、执行命令、修改 Git、重试测试，取决于 Agent/Harness 和执行环境。
-
-## 模型、Agent、执行环境是三层
+## 模型、Agent、Skill 是三层
 
 | 层 | 回答的问题 | 例子 |
 | --- | --- | --- |
 | 模型 | 谁负责理解与生成？ | Claude、GPT、Gemini、DeepSeek、GLM、Kimi |
 | Agent / Harness | 谁组织上下文、调用工具、循环执行？ | OpenCode、Claude Code、Codex CLI |
-| 执行环境 | 代码在哪里被读取、运行与测试？ | 本地终端、IDE、云端沙箱、GitHub Actions |
+| Skill | 如何把上下文、步骤和验收标准封装成可复用能力？ | `SKILL.md`、团队工作流、项目规范 |
 
-同一个模型放进不同 Agent，使用体验和安全边界可能完全不同；同一个 Agent 连接不同模型，能力、速度和成本也会变化。后面的课程会把模型选择落实为 `VIBE_BASE_URL`、`VIBE_API_KEY` 和 `<MODEL_ID>`，而不是把密钥写进仓库。
+同一个模型放进不同 Agent，使用体验和安全边界可能完全不同；同一个 Agent 连接不同模型，能力、速度和成本也会变化；Skill 则决定团队经验能否稳定复用。后面的课程会把模型选择落实为 `VIBE_BASE_URL`、`VIBE_API_KEY` 和 `<MODEL_ID>`，而不是把密钥写进仓库。
 
-## 三种常见工具形态
+## 两种常见工具形态
 
 ### 编辑器型：看得见、改得近
 
@@ -93,12 +87,6 @@ Cursor、GitHub Copilot 等把聊天、补全和多文件修改放在编辑器�
 OpenCode、Claude Code、Codex CLI、Gemini CLI 直接在项目终端工作。它们天然能够使用 Git、测试命令和脚本，也更容易接入企业模型 API。
 
 适合：Linux 环境、模型需要替换、希望把工作流写成脚本或规则的团队。
-
-### 云端型：让任务在后台并行
-
-云端 Agent 会克隆仓库，在隔离环境里完成任务，并通过 Diff 或 Pull Request 交付。它适合耗时任务和多人协作，但代码、依赖和日志会进入云端环境。
-
-适合：已有 GitHub 审查流程、允许代码进入指定云服务的团队。
 
 <Callout type="enterprise" title="企业判断顺序">
   先确认数据能否出网、模型从哪里调用、凭证如何托管、命令是否需要审批；这些问题解决后，再比较界面和模型效果。
@@ -119,6 +107,6 @@ OpenCode、Claude Code、Codex CLI、Gemini CLI 直接在项目终端工作。�
   items={[
     "我能说出本课约定的三家国外闭源模型和三家中国开放权重模型",
     "我会同时检查模型能力、部署方式、数据边界和成本，而不是只看榜单",
-    "我能区分模型、Agent 与执行环境，并理解为什么实践主线选择 OpenCode"
+    "我能区分模型、Agent 与 Skill，并理解为什么实践主线选择 OpenCode"
   ]}
 />

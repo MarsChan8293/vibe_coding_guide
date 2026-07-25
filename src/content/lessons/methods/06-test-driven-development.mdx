@@ -1,0 +1,55 @@
+---
+title: "Test-Driven Development：让测试先成为约束"
+description: "用失败测试、最小实现和回归检查把 Agent 的生成过程约束在可验证的行为上。"
+section: methods
+order: 6
+estimatedMinutes: 14
+prerequisites: ["会设计 Loop 的验证器"]
+outcomes:
+  - "理解 Red-Green-Refactor 在 Agent 协作中的用法"
+  - "把需求验收翻译成测试和可观察结果"
+  - "避免把测试写成迎合错误实现的装饰"
+tags: ["Test-Driven Development", "TDD", "回归测试"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["经典 TDD 实践", "Agent Evals 与代码测试实践"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+Test-Driven Development（TDD）不是让 Agent 多写测试，而是先用一个失败的、可运行的行为约束实现，再用最小修改让它通过，最后在不改变行为的前提下重构。
+
+## 可借鉴的 TDD Skill
+
+[Superpowers 的 `test-driven-development` Skill](https://github.com/obra/superpowers) 把 `RED → GREEN → REFACTOR` 固定成执行顺序，并附带测试反模式说明。它适合学习如何让 Agent 先写失败测试、观察失败，再实现最小改动；实际项目仍需替换成自己的测试命令和验收数据。
+
+## Red → Green → Refactor
+
+1. **Red**：写一个表达需求的失败测试；
+2. **Green**：让 Agent 做最小实现，只处理当前失败；
+3. **Refactor**：测试保持通过，再改善结构；
+4. **回归**：运行受影响区域和完整交付检查。
+
+```text
+需求：搜索结果链接必须保留 /vibe_coding_guide/ 子路径。
+Red：增加点击结果后的 URL 断言。
+Green：修正统一的 lessonPath 辅助函数。
+Refactor：删除重复的路径拼接逻辑。
+回归：npm test + 浏览器搜索路径测试。
+```
+
+Agent 写测试时，人要确认断言描述的是用户行为，而不是当前实现细节；失败真的能阻止错误实现；边界、错误路径、权限和敏感数据都得到考虑。
+
+<Callout type="warning" title="绿色测试不等于正确需求">
+  Agent 可能修改测试，让错误实现变绿。先审查测试断言，再审查实现；视觉、业务和安全仍需要人工验收。
+</Callout>
+
+TDD 适合稳定、可重复的代码行为；Agent Evals 还要检查多轮工具调用、最终环境状态和轨迹。测试约束局部行为，评测检查完整任务。
+
+<Checklist id="methods-tdd" items={[
+  "我能用 Red、Green、Refactor 描述一次实现循环",
+  "测试断言来自需求和用户行为，而不是迎合当前代码",
+  "我会先审查 Agent 生成的测试，再接受实现",
+  "自动化测试之外仍保留视觉、业务和安全验收"
+]} />

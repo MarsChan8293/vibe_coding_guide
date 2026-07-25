@@ -1,0 +1,68 @@
+---
+title: "Prompt Engineering：把单次任务说清楚"
+description: "用目标、范围、约束、验收和输出格式写出一次可执行的 Agent 任务描述。"
+section: methods
+order: 1
+estimatedMinutes: 10
+prerequisites: ["至少完成一次完整实践"]
+outcomes:
+  - "把模糊愿望改写成可执行任务"
+  - "区分 Prompt、Context、Harness 和 Loop 的职责"
+  - "为一次 Agent 调用写出可观察的完成标准"
+tags: ["Prompt Engineering", "任务描述", "验收标准"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["Anthropic Prompt Engineering 官方文档"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+Prompt Engineering 处理的是**一次任务描述**：你希望 Agent 这一次完成什么、不能做什么，以及怎样判断它完成了。它不是把整个仓库塞进提示词，也不是设计长期自动化系统。
+
+## 可借鉴的 Prompt Skill
+
+[grill-me](https://github.com/chenmingmin/grill-me) 适合在执行前连续追问需求，暴露歧义、遗漏和隐藏约束；[Superpowers 的 brainstorming Skill](https://github.com/obra/superpowers) 则把澄清问题、比较方案和确认设计组织成可复用流程。它们解决的是“把想法说清楚”，不是替代后续的规格、测试或人工审批。
+
+## 一条够用的任务指令
+
+```text
+目标：修复 GitHub Pages 子路径下的搜索结果跳转。
+范围：只检查搜索页面、路由辅助函数和现有 E2E 测试。
+约束：不更换 Pagefind，不改课程内容，不读取密钥。
+背景：本地根路径正常，生产 base 是 /vibe_coding_guide/。
+验收：点击搜索结果进入正确深层 URL；npm test 通过。
+输出：先报告计划，完成后报告实际命令、结果和未执行的检查。
+```
+
+## Prompt 的六个字段
+
+| 字段 | 要回答的问题 | 常见错误 |
+| --- | --- | --- |
+| 目标 | 哪个用户结果要改变？ | 只说“优化一下” |
+| 范围 | 哪些文件或行为在内？ | 默认整个仓库都能改 |
+| 约束 | 哪些东西不能碰？ | 把偏好写成硬性要求 |
+| 背景 | 哪些事实影响判断？ | 粘贴无用途的全部日志 |
+| 验收 | 什么结果可观察或运行验证？ | 用“写得好”代替标准 |
+| 输出 | 先分析、计划还是修改？ | 不要求报告实际证据 |
+
+如果需求涉及多个模块、依赖、权限或发布，先让 Agent 只读分析和计划；低风险的明确修改也必须验证。
+
+## Prompt 与其他方法的边界
+
+| 方法 | 解决什么问题 |
+| --- | --- |
+| Prompt Engineering | 这一次怎么把任务说清楚 |
+| Context Engineering | Agent 这一次应该看到哪些信息 |
+| Spec-Driven Development | 多步实现的规格和长期依据是什么 |
+| Harness Engineering | Agent 能使用哪些工具、权限和反馈 |
+| Loop Engineering | 任务如何重复执行、验证和停止 |
+
+不要用更长的 Prompt 代替后面四类工程工作。
+
+<Checklist id="methods-prompt" items={[
+  "任务描述包含目标、范围、约束、背景和验收",
+  "我能把形容词改成用户可观察的结果",
+  "我会要求 Agent 报告实际运行的命令与证据",
+  "我知道 Prompt 不负责替代上下文、Harness 和 Loop"
+]} />

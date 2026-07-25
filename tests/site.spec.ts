@@ -8,6 +8,17 @@ test("首页、课程导航和仓库子路径可用", async ({ page }) => {
   await expect(page).toHaveURL(/\/start\/?$/);
 });
 
+test("案例入口和占位页可访问", async ({ page }) => {
+  await page.goto("./");
+  await expect(page.locator(".desktop-nav").getByRole("link", { name: "案例" })).toHaveAttribute(
+    "href",
+    /\/cases\/$/
+  );
+  await page.goto("./cases/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("真实案例");
+  await expect(page.getByText("CASE 00")).toBeVisible();
+});
+
 test("历史时间轴可展开且包含八个节点", async ({ page }) => {
   await page.goto("./history/");
   const nodes = page.locator(".timeline details");
@@ -27,14 +38,40 @@ test("模型地图覆盖约定的六个模型家族", async ({ page }) => {
   }
 });
 
+test("方法课程覆盖八个工程概念", async ({ page }) => {
+  const lessons = [
+    ["prompt-engineering", "Prompt Engineering"],
+    ["context-engineering", "Context Engineering"],
+    ["spec-driven-development", "Spec-Driven Development"],
+    ["harness-engineering", "Harness Engineering"],
+    ["loop-engineering", "Loop Engineering"],
+    ["test-driven-development", "Test-Driven Development"],
+    ["human-in-the-loop", "Human-in-the-Loop"],
+    ["skills-engineering", "Skills Engineering"]
+  ];
+  for (const [slug, title] of lessons) {
+    await page.goto(`./methods/${slug}/`);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(title);
+  }
+});
+
 test("Skill 课程覆盖概念、图谱与编写实践", async ({ page }) => {
   await page.goto("./tools/agent-skills/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Skill");
   await expect(page.getByRole("heading", { name: "它和 MCP、AGENTS.md、脚本有什么不同？" })).toBeVisible();
   await page.getByRole("link", { name: /下一篇/ }).click();
   await expect(page).toHaveURL(/\/tools\/skill-map\/?$/);
-  await page.goto("./methods/write-skill/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("第一个可验证的 Skill");
+  await page.goto("./methods/skills-engineering/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Skills Engineering");
+});
+
+test("实践课程包含 Skill 安装与边界验证", async ({ page }) => {
+  await page.goto("./practice/install-skill/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("安装并验证第一个 Skill");
+  await expect(page.getByRole("heading", { name: "第三步：安装到当前项目" })).toBeVisible();
+  await expect(page.locator(".prose")).toContainText(".opencode/skills/github-pages-release-check/SKILL.md");
+  await page.getByRole("link", { name: /下一篇/ }).click();
+  await expect(page).toHaveURL(/\/practice\/portfolio-brief\/?$/);
 });
 
 test("中文搜索可以找到课程", async ({ page }) => {

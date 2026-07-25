@@ -1,0 +1,52 @@
+---
+title: "Harness Engineering：为 Agent 设计工程环境"
+description: "把项目规则、工具、权限、测试、日志和恢复机制组织成 Agent 可以可靠工作的环境。"
+section: methods
+order: 4
+estimatedMinutes: 14
+prerequisites: ["会用规格描述功能"]
+outcomes:
+  - "识别 Agent Harness 的组成部分"
+  - "用项目规则和工具降低重复解释"
+  - "为 Agent 设置权限、反馈和恢复边界"
+tags: ["Harness Engineering", "工具", "权限", "反馈"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["OpenAI Harness Engineering 官方文章", "Anthropic Effective Harnesses 官方文章"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+Harness Engineering 关注 Agent 在什么环境里工作：它能读取什么、使用哪些工具、收到什么反馈、如何判断完成、失败后怎样恢复。OpenAI 将这类工作概括为设计环境、明确意图和建立反馈循环。
+
+## 可借鉴的 Harness 机制
+
+[Claude Code Plugins](https://code.claude.com/docs/en/plugins)、Hooks 和 Permissions 可以组合成一个 Harness：插件提供能力，Hook 在工具调用前后执行确定性检查，权限系统决定哪些动作必须得到人工批准。这里没有一个“万能 Harness Skill”；关键是把工具、反馈、审批和恢复路径组合起来，并且让这些边界可以审计。
+
+## 一个 Harness 包含什么
+
+| 部件 | 项目中的例子 |
+| --- | --- |
+| 任务规范 | `SPEC.md`、Issue、验收清单 |
+| 项目记忆 | `AGENTS.md`、README、架构说明 |
+| 工具接口 | 搜索、编辑、Git、测试命令 |
+| 反馈系统 | 类型检查、单测、E2E、构建日志 |
+| 状态与观测 | 进度文件、Diff、命令输出 |
+| 权限边界 | 工作区、网络、凭证和发布审批 |
+| 恢复机制 | 小提交、worktree、回滚和停止开关 |
+
+项目规则应回答如何安装、测试和构建，哪些文件不能改，何时必须先计划，以及完成后要提供什么证据。规则要短、可执行、经常验证。
+
+Agent 能在几分钟内改几十个文件，不代表应该允许它这么做。一次理想任务应解决一个可命名的问题、修改高度相关的文件、能运行明确检查，并且可整体撤销。
+
+<Callout type="warning" title="权限不是体验选项">
+  删除、发布、发送消息、访问生产数据和读取凭证都应该有明确人工闸门。自动化越强，权限与停止机制越应该写进 Harness。
+</Callout>
+
+<Checklist id="methods-harness" items={[
+  "我能说出项目 Harness 的规则、工具、反馈和权限边界",
+  "项目规则里包含可运行的命令，而不是只有口号",
+  "一次任务的 Diff 和回退点都可审查",
+  "高风险动作有人工审批和停止机制"
+]} />

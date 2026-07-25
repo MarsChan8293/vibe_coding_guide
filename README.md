@@ -27,8 +27,8 @@ GitHub Actions 会自动发布到
 ## 内容结构
 
 - 历史：1 篇短时间轴，从 2025 年讲到 Agentic Engineering
-- 工具：8 篇，理解终端、编辑器、云端 Agent、Agent Skills 与企业选型
-- 实践：11 篇，从 Linux 环境走到 GitHub Pages
-- 方法：7 篇，建立上下文、计划、验证、调试、安全习惯与 Skill 编写
+- 工具：7 篇，理解终端、编辑器、Agent Skills 与企业选型
+- 实践：10 篇，从 Linux 环境、Skill 安装走到作品审查
+- 方法：8 篇，从 Prompt Engineering 到 Skills Engineering，建立可验证的 Agent 协作方法
 
 所有 API 示例只使用环境变量和占位符。请勿把真实密钥、内网地址或客户信息提交到仓库。

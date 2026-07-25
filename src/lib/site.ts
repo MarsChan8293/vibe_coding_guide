@@ -4,13 +4,13 @@ export const SITE_TITLE = "Vibe Coding：从感觉到工程";
 export const SITE_DESCRIPTION =
   "面向企业环境零基础创作者的 Vibe Coding 中文教程：从 OpenCode 配置到可验证的软件交付。";
 export const BASE = `${import.meta.env.BASE_URL.replace(/\/+$/, "")}/`;
-export const TOTAL_LESSONS = 27;
+export const TOTAL_LESSONS = 26;
 
 export const sections = {
-  history: { label: "历史切片", index: "01", color: "朱红" },
-  tools: { label: "工具地图", index: "02", color: "墨黑" },
-  practice: { label: "实践教程", index: "03", color: "橄榄" },
-  methods: { label: "方法总结", index: "04", color: "靛蓝" }
+  history: { label: "历史回顾", index: "01", color: "朱红" },
+  tools: { label: "工具介绍", index: "02", color: "墨黑" },
+  practice: { label: "入门教程", index: "03", color: "橄榄" },
+  methods: { label: "工程方法", index: "04", color: "靛蓝" }
 } as const;
 
 export type LessonEntry = CollectionEntry<"lessons">;

@@ -4,8 +4,7 @@ interface Source {
   href: string;
 }
 
-interface Event {
-  date: string;
+interface TrackEvent {
   title: string;
   concept: string;
   summary: string;
@@ -14,54 +13,150 @@ interface Event {
   sources: Source[];
 }
 
+interface TimelineEvent {
+  date: string;
+  sort: string;
+  model?: TrackEvent;
+  agent?: TrackEvent;
+}
+
 interface Props {
-  events: Event[];
+  events: TimelineEvent[];
 }
 
 const { events } = Astro.props;
 ---
 
-<ol class="timeline" aria-label="2025 年至今的 Vibe Coding 时间轴">
+<section class="timeline-wrap" aria-labelledby="timeline-title">
+  <header class="timeline-heading">
+    <p class="eyebrow">TWO TRACKS / ONE SHIFT</p>
+    <h2 id="timeline-title">模型能力，与行动能力</h2>
+    <p>从模型发布到工具形态，观察 AI 编程如何一步步走向可执行、可复用的工程协作。</p>
+  </header>
+
+  <div class="track-labels" aria-hidden="true">
+    <span>模型发布</span>
+    <span>时间</span>
+    <span>工具 / Agent</span>
+  </div>
+
+  <ol class="timeline" aria-label="2025 年至今的模型与 AI 工具时间轴">
   {events.map((event, index) => (
     <li>
-      <div class="event-rail">
-        <span class="event-index">{String(index + 1).padStart(2, "0")}</span>
-        <time class="event-date">{event.date}</time>
-      </div>
-      <span class="event-node" aria-hidden="true"></span>
-      <details open={index === 1 || index === events.length - 1}>
+      {event.model && (
+      <details class="event-card model-card" open={index === 0 || index === events.length - 1}>
         <summary>
-          <strong>{event.title}</strong>
-          <span class="event-concept">{event.concept}</span>
+          <span class="track-kicker">模型发布</span>
+          <strong>{event.model.title}</strong>
+          <span class="event-concept">{event.model.concept}</span>
         </summary>
         <div class="event-body">
-          <p>{event.summary}</p>
+          <p>{event.model.summary}</p>
           <dl>
             <div>
               <dt>为什么重要</dt>
-              <dd>{event.impact}</dd>
+              <dd>{event.model.impact}</dd>
             </div>
             <div>
               <dt>留下的问题</dt>
-              <dd>{event.question}</dd>
+              <dd>{event.model.question}</dd>
             </div>
           </dl>
           <p class="event-sources">
-            {event.sources.map((source) => (
+            {event.model.sources.map((source) => (
               <a href={source.href} target="_blank" rel="noreferrer">{source.label} ↗</a>
             ))}
           </p>
         </div>
       </details>
+      )}
+      <div class="event-rail">
+        <span class="event-index">{String(index + 1).padStart(2, "0")}</span>
+        <time class="event-date" datetime={event.sort}>{event.date}</time>
+        <span class="event-node" aria-hidden="true"></span>
+      </div>
+      {event.agent && (
+      <details class="event-card agent-card" open={index === 0 || index === events.length - 1}>
+        <summary>
+          <span class="track-kicker">工具 / Agent</span>
+          <strong>{event.agent.title}</strong>
+          <span class="event-concept">{event.agent.concept}</span>
+        </summary>
+        <div class="event-body">
+          <p>{event.agent.summary}</p>
+          <dl>
+            <div>
+              <dt>为什么重要</dt>
+              <dd>{event.agent.impact}</dd>
+            </div>
+            <div>
+              <dt>留下的问题</dt>
+              <dd>{event.agent.question}</dd>
+            </div>
+          </dl>
+          <p class="event-sources">
+            {event.agent.sources.map((source) => (
+              <a href={source.href} target="_blank" rel="noreferrer">{source.label} ↗</a>
+            ))}
+          </p>
+        </div>
+      </details>
+      )}
     </li>
   ))}
-</ol>
+  </ol>
+</section>
 
 <style>
+  .timeline-wrap {
+    width: min(1180px, 100%);
+    margin: 4rem 0;
+  }
+
+  .timeline-heading {
+    width: min(640px, 100%);
+    margin-bottom: 2.25rem;
+  }
+
+  .eyebrow,
+  .track-labels,
+  .track-kicker {
+    color: var(--red-dark);
+    font: 700 .68rem/1.2 var(--mono);
+    letter-spacing: .08em;
+  }
+
+  .timeline-heading h2 {
+    margin: .65rem 0 .75rem;
+    font: 700 clamp(2rem, 4.5vw, 3.75rem)/.98 var(--serif);
+    letter-spacing: -.04em;
+  }
+
+  .timeline-heading p:last-child {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .track-labels {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 8.5rem minmax(0, 1fr);
+    gap: 1.5rem;
+    margin: 0 0 .85rem;
+    padding: 0 .25rem;
+  }
+
+  .track-labels span:nth-child(2) {
+    text-align: center;
+  }
+
+  .track-labels span:last-child {
+    text-align: right;
+  }
+
   .timeline {
     display: grid;
-    width: min(960px, calc(100vw - 3rem));
-    margin: 4rem 0;
+    width: 100%;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
@@ -70,7 +165,8 @@ const { events } = Astro.props;
     position: relative;
     display: grid;
     min-width: 0;
-    grid-template-columns: 9.5rem 2.5rem minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 8.5rem minmax(0, 1fr);
+    gap: 1.5rem;
     padding-bottom: 2rem;
   }
 
@@ -78,14 +174,14 @@ const { events } = Astro.props;
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 10.7rem;
+    left: calc(50% - .5px);
     width: 1px;
     content: "";
     background: var(--line);
   }
 
   .timeline li:first-child::before {
-    top: 1.5rem;
+    top: 3rem;
   }
 
   .timeline li:last-child {
@@ -94,14 +190,15 @@ const { events } = Astro.props;
 
   .timeline li:last-child::before {
     bottom: auto;
-    height: 1.5rem;
+    height: 3rem;
   }
 
   .event-rail {
+    grid-column: 2;
     display: grid;
     align-content: start;
-    justify-items: end;
-    padding: .75rem 1.2rem 0 0;
+    justify-items: center;
+    padding: .35rem 0 0;
     text-align: right;
   }
 
@@ -114,7 +211,7 @@ const { events } = Astro.props;
     margin-top: .45rem;
     color: var(--muted);
     font: 650 .78rem/1.5 var(--mono);
-    white-space: nowrap;
+    text-align: center;
   }
 
   .event-node {
@@ -122,15 +219,14 @@ const { events } = Astro.props;
     display: block;
     width: .95rem;
     height: .95rem;
-    margin-top: 1.05rem;
-    place-self: start center;
+    margin-top: .85rem;
     border: 3px solid var(--paper);
     border-radius: 50%;
     background: var(--red);
     box-shadow: 0 0 0 1px var(--red);
   }
 
-  details {
+  .event-card {
     min-width: 0;
     border: 1px solid var(--line);
     background: rgba(255,255,255,.23);
@@ -139,7 +235,7 @@ const { events } = Astro.props;
 
   summary {
     display: grid;
-    min-height: 108px;
+    min-height: 134px;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: .55rem 1.25rem;
@@ -154,7 +250,7 @@ const { events } = Astro.props;
 
   summary::after {
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 1 / span 2;
     content: "+";
     font: 500 1.5rem/1 var(--mono);
   }
@@ -163,11 +259,9 @@ const { events } = Astro.props;
     content: "−";
   }
 
-  .event-concept {
-    font-family: var(--mono);
-  }
-
   summary strong {
+    grid-column: 1;
+    grid-row: 2;
     min-width: 0;
     font-family: var(--serif);
     font-size: clamp(1.2rem, 2vw, 1.55rem);
@@ -177,7 +271,7 @@ const { events } = Astro.props;
 
   .event-concept {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 3;
     color: var(--muted);
     font-size: .75rem;
     line-height: 1.6;
@@ -188,7 +282,7 @@ const { events } = Astro.props;
     border-top: 1px solid var(--soft-line);
   }
 
-  details[open] .event-body {
+  .event-card[open] .event-body {
     animation: reveal .22s ease-out;
   }
 
@@ -227,14 +321,34 @@ const { events } = Astro.props;
     font: 650 .75rem/1.5 var(--mono);
   }
 
+  .model-card {
+    grid-column: 1;
+  }
+
+  .agent-card {
+    grid-column: 3;
+  }
+
+  .model-card .track-kicker {
+    color: var(--red-dark);
+  }
+
+  .agent-card .track-kicker {
+    color: var(--ink);
+  }
+
   @media (max-width: 680px) {
-    .timeline {
-      width: 100%;
+    .timeline-wrap {
       margin-block: 3rem;
+    }
+
+    .track-labels {
+      display: none;
     }
 
     .timeline li {
       grid-template-columns: 1.5rem minmax(0, 1fr);
+      gap: 0 .8rem;
       padding-bottom: 1.75rem;
     }
 
@@ -259,17 +373,26 @@ const { events } = Astro.props;
 
     .event-date {
       margin-top: 0;
+      text-align: left;
     }
 
     .event-node {
       grid-column: 1;
-      grid-row: 1 / span 2;
+      grid-row: 1 / span 3;
       margin-top: .38rem;
     }
 
-    details {
+    .event-card {
       grid-column: 2;
+    }
+
+    .model-card {
       grid-row: 2;
+      margin-bottom: .75rem;
+    }
+
+    .agent-card {
+      grid-row: 3;
     }
 
     summary {
@@ -287,6 +410,12 @@ const { events } = Astro.props;
 
     dl {
       grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .event-card[open] .event-body {
+      animation: none;
     }
   }
 </style>

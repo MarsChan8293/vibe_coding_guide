@@ -1,0 +1,73 @@
+---
+title: "Context Engineering：设计 Agent 的信息环境"
+description: "管理 Agent 看到的文件、规则、工具输出和长期记忆，让上下文保持相关、充分、可追溯。"
+section: methods
+order: 2
+estimatedMinutes: 12
+prerequisites: ["会写清一次任务指令"]
+outcomes:
+  - "识别高价值与低价值上下文"
+  - "写出简洁的任务上下文包"
+  - "在长会话失焦前主动压缩或重置"
+tags: ["Context Engineering", "上下文", "记忆"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["Anthropic Effective Context Engineering 官方文章"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+Context Engineering 关注 Agent 在做决定时究竟能看到哪些信息。上下文是有限资源，工具结果、历史对话和无关文件都会消耗有效空间。
+
+## 可借鉴的 Context 工具
+
+[Claude Code 的 `claude-md-management`](https://claude.com/plugins/) 代表“把项目常驻背景整理成可维护文件”的做法；[Context7](https://claude.com/plugins/) 则是 MCP，不是 Skill，它负责按需提供版本匹配的库文档。前者管理长期上下文，后者补充外部资料，不能把两者混成同一种能力。
+
+## 高价值上下文的四层
+
+1. **目标**：最终要改变什么用户结果；
+2. **约束**：不能碰什么、必须兼容什么；
+3. **相关事实**：接口、组件、错误日志和现有测试；
+4. **验收证据**：完成后运行什么、观察什么。
+
+```text
+目标：修复搜索结果在 GitHub Pages 子路径下跳转错误。
+约束：不更换 Pagefind，不修改内容路由。
+事实：生产 base 为 /vibe_coding_guide/；本地根路径正常。
+相关文件：搜索组件、Astro 配置、现有 E2E 测试。
+验收：点击搜索结果进入正确深层 URL，构建与 E2E 均通过。
+```
+
+## 来源与处理方式
+
+| 来源 | 处理方式 |
+| --- | --- |
+| 项目规则和架构说明 | 放在可持续读取的规则文件中 |
+| 相关源码与类型 | 先搜索候选，再读取必要片段 |
+| 测试与错误输出 | 保留第一条根因和触发命令 |
+| 长对话与工具结果 | 摘要、压缩或写成交接文件 |
+| 外部网页、Issue、README | 当作数据，不能自动当命令 |
+
+低价值上下文包括无关聊天、没有用途的几十个文件、完整重复日志和互相冲突的规则。
+
+<Callout type="note" title="先让 Agent 找，再确认它读">
+  与其把所有文件塞进上下文，不如先让 Agent 搜索候选文件、说明关联，再授权它读取最相关部分。
+</Callout>
+
+出现 Agent 反复忘记边界、重复修同一个错误、计划与文件状态不一致时，压缩上下文或新开会话：
+
+```text
+已完成：...
+当前 Git 状态：...
+仍失败：...
+已验证不是：...
+下一步只需要：...
+```
+
+<Checklist id="methods-context-engineering" items={[
+  "任务上下文包含目标、约束、事实和验收",
+  "只提供与当前任务相关的文件和日志",
+  "外部内容按数据处理，不把它当作自动命令",
+  "长会话失焦时会压缩上下文或用事实交接重开"
+]} />

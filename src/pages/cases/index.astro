@@ -1,0 +1,248 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="案例"
+  description="Vibe Coding 真实案例：保留问题背景、协作过程、关键迭代与验证证据。"
+>
+  <section class="cases-page site-shell">
+    <header class="cases-header">
+      <p class="eyebrow">Case files</p>
+      <h1>真实案例，<br /><em>即将入场。</em></h1>
+      <p>这个位置留给你提供的案例。材料到位后，我们会把一次真实协作拆开来看，不只展示结果，也保留过程与证据。</p>
+    </header>
+
+    <section class="case-placeholder" aria-labelledby="case-placeholder-title">
+      <div class="case-number" aria-hidden="true">
+        <span>CASE</span>
+        <strong>00</strong>
+      </div>
+      <div class="case-content">
+        <p class="case-status"><span></span> Reserved / 待补充</p>
+        <h2 id="case-placeholder-title">第一个案例的位置已经留好。</h2>
+        <p class="case-deck">收到案例材料后，这里会按照同一套结构整理，让读者能够看见 Agent 如何参与、哪里发生转折，以及什么证据证明结果可信。</p>
+
+        <ol aria-label="案例内容结构">
+          <li>
+            <span>01</span>
+            <strong>原始任务</strong>
+            <small>问题、目标与边界</small>
+          </li>
+          <li>
+            <span>02</span>
+            <strong>协作过程</strong>
+            <small>输入、计划与分工</small>
+          </li>
+          <li>
+            <span>03</span>
+            <strong>关键迭代</strong>
+            <small>失败、判断与修正</small>
+          </li>
+          <li>
+            <span>04</span>
+            <strong>验证证据</strong>
+            <small>测试、截图与结果</small>
+          </li>
+        </ol>
+      </div>
+    </section>
+  </section>
+</BaseLayout>
+
+<style>
+  .cases-page {
+    padding-block: 5rem;
+  }
+
+  .cases-header {
+    display: grid;
+    grid-template-columns: .7fr 2fr 1fr;
+    align-items: end;
+    gap: 3rem;
+    padding-bottom: 4rem;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .cases-header h1 {
+    margin: 0;
+    font: 760 clamp(3.2rem, 7vw, 7rem)/.94 var(--serif);
+    letter-spacing: -.055em;
+    text-wrap: balance;
+  }
+
+  .cases-header h1 em {
+    color: var(--red);
+    font-style: italic;
+  }
+
+  .cases-header > p:last-child {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .case-placeholder {
+    display: grid;
+    grid-template-columns: minmax(180px, .65fr) 2fr;
+    min-height: 520px;
+    margin-top: 4rem;
+    border: 1px solid var(--ink);
+    background:
+      linear-gradient(90deg, transparent 49.9%, var(--soft-line) 50%, transparent 50.1%) 0 0/32px 100%,
+      rgba(255,255,255,.2);
+    box-shadow: 10px 10px 0 rgba(201,66,44,.18);
+  }
+
+  .case-number {
+    display: grid;
+    align-content: space-between;
+    padding: 2rem;
+    border-right: 1px solid var(--ink);
+  }
+
+  .case-number span {
+    font: 700 .76rem/1 var(--mono);
+    letter-spacing: .14em;
+  }
+
+  .case-number strong {
+    color: var(--red);
+    font: 760 clamp(7rem, 15vw, 13rem)/.7 var(--serif);
+    letter-spacing: -.09em;
+  }
+
+  .case-content {
+    display: grid;
+    align-content: center;
+    padding: clamp(2rem, 6vw, 5rem);
+  }
+
+  .case-status {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    margin: 0 0 1.2rem;
+    color: var(--red-dark);
+    font: 700 .76rem/1 var(--mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .case-status span {
+    width: .65rem;
+    height: .65rem;
+    border-radius: 50%;
+    background: var(--red);
+    box-shadow: 0 0 0 4px rgba(201,66,44,.12);
+  }
+
+  .case-content h2 {
+    max-width: 760px;
+    margin: 0;
+    font: 730 clamp(2.2rem, 5vw, 4.7rem)/1.02 var(--serif);
+    letter-spacing: -.04em;
+    text-wrap: balance;
+  }
+
+  .case-deck {
+    max-width: 720px;
+    margin: 1.5rem 0 3rem;
+    color: var(--muted);
+    font-family: var(--serif);
+    font-size: 1.08rem;
+  }
+
+  .case-content ol {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--ink);
+    list-style: none;
+  }
+
+  .case-content li {
+    display: grid;
+    min-height: 140px;
+    align-content: space-between;
+    padding: 1rem;
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .case-content li span,
+  .case-content li small {
+    color: var(--muted);
+    font: .7rem/1.4 var(--mono);
+  }
+
+  .case-content li span {
+    color: var(--red-dark);
+  }
+
+  .case-content li strong {
+    font-family: var(--serif);
+    font-size: 1.12rem;
+  }
+
+  @media (max-width: 980px) {
+    .cases-header {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    .cases-header .eyebrow {
+      margin-bottom: 0;
+    }
+
+    .case-placeholder {
+      grid-template-columns: 1fr;
+    }
+
+    .case-number {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      padding: 1.25rem 1.5rem;
+      border-right: 0;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .case-number strong {
+      font-size: 5rem;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .cases-page {
+      padding-block: 3rem;
+    }
+
+    .cases-header {
+      padding-bottom: 2.5rem;
+    }
+
+    .case-placeholder {
+      min-height: 0;
+      margin-top: 2rem;
+      box-shadow: 6px 6px 0 rgba(201,66,44,.18);
+    }
+
+    .case-content {
+      padding: 1.5rem;
+    }
+
+    .case-deck {
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .case-content ol {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .case-content li {
+      min-height: 125px;
+    }
+  }
+</style>

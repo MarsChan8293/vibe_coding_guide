@@ -1,0 +1,152 @@
+---
+title: "安装并验证第一个 Skill"
+description: "先审计一个项目级、只读的发布检查 Skill，再让 OpenCode 发现它并验证触发条件与安全边界。"
+section: practice
+order: 6
+estimatedMinutes: 22
+prerequisites: ["发布前检查已经通过", "理解 Skill 的作用域与审计方法"]
+outcomes:
+  - "把 Skill 安装到项目级目录"
+  - "在安装前检查来源、内容与权限边界"
+  - "用正例和越界请求验证 Skill"
+tags: ["Agent Skills", "安装", "供应链", "OpenCode"]
+reviewedAt: "2026-07-25"
+reviewedAgainst:
+  - "https://opencode.ai/docs/skills/"
+  - "Agent Skills 开放规范"
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+OpenCode 不需要单独的 Skill 插件。所谓“安装”，就是把一个经过审计的 Skill 目录放进它会发现的位置。本课安装项目级 Skill，只对当前作品集生效，也能跟随 Git 一起审查和撤销。
+
+## 第一步：确认安装目标
+
+OpenCode 会从下面的路径发现项目级 Skill：
+
+```text
+.opencode/skills/<skill-name>/SKILL.md
+```
+
+这次使用 `github-pages-release-check`。它只负责发布前检查，不修改文件、不提交、不推送，也不部署。
+
+<Callout type="warning" title="先审计，后复制">
+  不要对陌生 Skill 使用“一键安装”命令。先查看 `SKILL.md`、它引用的文件和全部脚本；确认来源、权限、网络访问与撤销方式后，再把目录复制进项目。
+</Callout>
+
+## 第二步：审计准备安装的内容
+
+在管理员批准的临时目录中打开 `SKILL.md`，逐项确认：
+
+- `name` 与目录名完全一致；
+- `description` 只在发布前检查时触发；
+- 没有要求读取密钥、环境变量值或工作区外文件；
+- 没有修改、删除、提交、推送或部署动作；
+- 没有未审查的脚本、依赖和外部连接。
+
+本练习使用下面这个最小 Skill。先完整阅读，再复制：
+
+```md
+---
+name: github-pages-release-check
+description: >
+  在准备发布 Astro 静态站点到 GitHub Pages 时，执行只读检查并报告
+  通过项、警告与阻塞项。不修改文件，不提交、不推送、不部署。
+compatibility: opencode
+metadata:
+  scope: project
+  risk: read-only
+---
+
+# GitHub Pages 发布前检查
+
+## 工作流
+1. 读取 Git 状态、package.json、Astro 配置和 Pages 工作流。
+2. 运行仓库已经定义的测试与构建命令。
+3. 检查 site、base、资源路径和深层 URL 的验证证据。
+4. 按“通过 / 警告 / 阻塞”报告结果，并附命令与证据。
+
+## 安全边界
+- 只读取当前 Git 工作树。
+- 不读取或打印密钥、令牌和环境变量值。
+- 不安装依赖，不修改或删除文件。
+- 不执行 commit、push、部署或发布。
+- 缺少命令、权限或证据时，报告阻塞并等待用户决定。
+```
+
+如果 Skill 来自第三方仓库，还要记录仓库地址、commit SHA 或 tag、审计日期和撤销方式。没有固定版本的下载链接会随时间变化，不适合作为企业安装基线。
+
+## 第三步：安装到当前项目
+
+创建目录：
+
+```bash
+mkdir -p .opencode/skills/github-pages-release-check
+nano .opencode/skills/github-pages-release-check/SKILL.md
+```
+
+粘贴刚才审计过的内容，保存后重新读取文件，确认磁盘中的内容没有缺失：
+
+```bash
+sed -n '1,220p' .opencode/skills/github-pages-release-check/SKILL.md
+git status --short
+```
+
+状态中应只新增 `.opencode/skills/github-pages-release-check/SKILL.md`。若还出现脚本、配置或依赖文件，先停下来查明来源。
+
+## 第四步：让 OpenCode 发现 Skill
+
+如果 OpenCode 已经在运行，退出当前会话，再从作品集仓库根目录重新启动：
+
+```bash
+opencode
+```
+
+输入一个正例：
+
+```text
+请使用 github-pages-release-check Skill 检查当前项目是否已经可以发布。
+只执行 Skill 允许的只读检查，不修改文件，不提交、不推送、不部署。
+```
+
+你应该看到 OpenCode 加载这个 Skill，并按“通过 / 警告 / 阻塞”报告证据。如果提示找不到，依次检查：
+
+1. 文件名是否严格为 `SKILL.md`；
+2. 目录名与 frontmatter 的 `name` 是否都是 `github-pages-release-check`；
+3. OpenCode 是否从当前 Git 工作树内启动；
+4. `opencode.json` 是否把该 Skill 的权限设为 `deny`。
+
+## 第五步：测试边界并留下基线
+
+再输入一个越界请求：
+
+```text
+检查通过后直接替我提交、推送并部署。
+```
+
+Skill 应把这些动作留给明确授权，而不是把“检查”扩张成“发布”。验证完成后，先暂存新增文件，让 Git 显示完整 Diff；确认无误再提交这个项目能力：
+
+```bash
+git add .opencode/skills/github-pages-release-check/SKILL.md
+git diff --cached -- .opencode/skills/github-pages-release-check/SKILL.md
+git commit -m "Add read-only Pages release check skill"
+git status
+```
+
+<Callout type="checkpoint" title="现在它才算安装完成">
+  文件已经进入项目、OpenCode 能发现它、触发行为与越界行为都经过验证，并且 Git 留下了可审查、可撤销的版本。
+</Callout>
+
+<Checklist
+  id="practice-install-skill"
+  items={[
+    "我在安装前完整阅读了 SKILL.md 及其引用内容",
+    "Skill 安装在当前项目的 .opencode/skills/ 目录",
+    "目录名与 frontmatter 中的 name 完全一致",
+    "OpenCode 能在正例请求中加载并执行该 Skill",
+    "Skill 面对提交、推送和部署请求时保持了只读边界",
+    "安装来源、版本和撤销方式可以追溯"
+  ]}
+/>

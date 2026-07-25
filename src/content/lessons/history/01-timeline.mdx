@@ -1,125 +1,283 @@
 ---
 title: "从 Vibe Coding 到 Agentic Engineering"
-description: "从 2025 年开始，用八个事件看懂 AI 编程如何从“生成代码”走向可复用、可监督、长期运行的 Agent。"
+description: "从 2025 年开始，用双轨时间轴看懂 Coding 模型的发布，如何与 Vibe Coding、Agent、Skills 和工程实践相互推动。"
 section: history
 order: 1
 estimatedMinutes: 14
 prerequisites: []
 outcomes:
+  - "区分模型发布与工具、Agent 工作方式的演进"
   - "说清 Vibe Coding、Coding Agent、Skills 与 Agentic Engineering 的关系"
   - "把产品热度与真正的工作方式变化区分开"
   - "理解为什么能力越强，验证和权限边界越重要"
-tags: ["时间轴", "概念演进", "2025–2026"]
+tags: ["时间轴", "模型发布", "概念演进", "2025–2026"]
 reviewedAt: "2026-07-25"
 reviewedAgainst:
   - "DeepSeek 官方发布"
-  - "Anthropic Claude Code 与 Agent Skills 官方发布"
-  - "OpenAI Codex 官方发布"
+  - "Anthropic Claude 与 Agent Skills 官方发布"
+  - "OpenAI GPT 与 Codex 官方发布"
+  - "Google Gemini 官方发布"
+  - "Z.AI GLM 与 Moonshot Kimi 官方发布"
   - "OpenClaw 官方仓库"
 draft: false
 ---
 
 import Timeline from "../../../components/Timeline.astro";
-import Callout from "../../../components/Callout.astro";
 
-export const events = [
+export const milestones = [
   {
-    date: "2025 年 1 月",
-    title: "DeepSeek-R1 与开放推理模型",
-    concept: "推理模型 / 开放权重 / 本地部署",
-    summary: "DeepSeek-R1 的发布让更多团队看到：强推理能力不必只存在于一个封闭应用里。模型权重、API 服务与上层工具可以被拆开选择，企业也可以在自己的基础设施中提供兼容接口。",
-    impact: "Coding Agent 开始更像一个可替换模型的工作台。你可以保留同一套 OpenCode 工作方式，同时由管理员切换后端模型。",
-    question: "开放或本地部署不自动等于安全。模型能力、服务权限、日志留存和数据边界仍需要分别评估。",
-    sources: [
-      { label: "DeepSeek 官方发布", href: "https://api-docs.deepseek.com/news/news250120/" }
-    ]
-  },
-  {
-    date: "2025 年 2 月 2 日",
-    title: "Vibe Coding 被命名",
-    concept: "自然语言编程 / Accept All / 快速原型",
-    summary: "Andrej Karpathy 用“Vibe Coding”描述一种新体验：说出想法，运行 AI 写出的代码，看到问题后继续用语言调整。这个词捕捉到的不是新语法，而是人与代码关系的变化。",
-    impact: "产品、设计和运营人员第一次能直接做出可运行的软件原型。表达意图的能力，开始比记忆 API 更早产生价值。",
-    question: "原始描述带有“忘掉代码”的轻松意味，适合探索性项目；当软件进入生产，谁来理解风险并对结果负责？",
-    sources: [
-      { label: "Collins 2025 年度词", href: "https://www.collinsdictionary.com/de/woty" }
-    ]
+    date: "2025 年 1 月至 2 月",
+    model: {
+      title: "DeepSeek-R1 与开放推理模型",
+      concept: "推理模型 / 开放权重 / 本地部署",
+      summary: "DeepSeek-R1 让更多团队看到：强推理能力不必只存在于一个封闭应用里。模型权重、API 服务与上层工具可以被拆开选择，企业也可以在自己的基础设施中提供兼容接口。",
+      impact: "Coding Agent 开始更像一个可替换模型的工作台。保留同一套 OpenCode 工作方式时，管理员可以切换后端模型。",
+      question: "开放权重或本地部署不自动等于安全。模型能力、服务权限、日志留存和数据边界仍要分别评估。",
+      sources: [
+        { label: "DeepSeek-R1 官方发布", href: "https://api-docs.deepseek.com/news/news250120/" }
+      ]
+    },
+    agent: {
+      title: "Vibe Coding 被命名",
+      concept: "自然语言编程 / Accept All / 快速原型",
+      summary: "Andrej Karpathy 用“Vibe Coding”描述一种新体验：说出想法，运行 AI 写出的代码，看到问题后继续用语言调整。这个词捕捉到的不是新语法，而是人与代码关系的变化。",
+      impact: "产品、设计和运营人员第一次能直接做出可运行的软件原型。表达意图的能力，开始比记忆 API 更早产生价值。",
+      question: "原始描述带有“忘掉代码”的轻松意味，适合探索性项目；当软件进入生产，谁来理解风险并对结果负责？",
+      sources: [
+        { label: "Collins 2025 年度词", href: "https://www.collinsdictionary.com/de/woty" }
+      ]
+    }
   },
   {
     date: "2025 年 2 月 24 日",
-    title: "Claude Code 引爆终端 Agent",
-    concept: "Agentic Coding / 工具调用 / 自动测试",
-    summary: "Claude Code 的研究预览把 Agent 放进终端：它能搜索仓库、编辑文件、执行命令、运行测试。工作的基本单位不再是一个函数或代码片段，而是一个带有验收条件的工程任务。",
-    impact: "终端成为 Agent 的通用接口。后续 OpenCode、Codex CLI、Gemini CLI 等工具都强化了“读—改—跑—查”的循环。",
-    question: "能执行命令意味着能造成真实影响。审批、沙箱、版本控制和最小权限开始成为日常使用的一部分。",
-    sources: [
-      { label: "Anthropic 官方发布", href: "https://www.anthropic.com/news/claude-3-7-sonnet" }
-    ]
+    model: {
+      title: "Claude 3.7 Sonnet：推理进入 Coding 工作流",
+      concept: "混合推理 / 代码能力 / 长任务",
+      summary: "Claude 3.7 Sonnet 把即时回答与可延长的推理放在同一个模型里，并重点展示了代码任务能力。它是这一轮“让模型直接参与工程”的代表性起点。",
+      impact: "模型不再只生成局部代码建议，也开始更适合处理跨文件理解、修改和验证这类需要连续判断的任务。",
+      question: "更长的推理不会替代验收。模型输出的计划、修改和测试证据仍需要由人或可靠的自动化机制检查。",
+      sources: [
+        { label: "Claude 3.7 Sonnet 官方发布", href: "https://www.anthropic.com/news/claude-3-7-sonnet" }
+      ]
+    },
+    agent: {
+      title: "Claude Code 引爆终端 Agent",
+      concept: "Agentic Coding / 工具调用 / 自动测试",
+      summary: "Claude Code 的研究预览把 Agent 放进终端：它能搜索仓库、编辑文件、执行命令、运行测试。工作的基本单位不再是一个函数或代码片段，而是一个带有验收条件的工程任务。",
+      impact: "终端成为 Agent 的通用接口。后续 OpenCode、Codex CLI、Gemini CLI 等工具都强化了“读—改—跑—查”的循环。",
+      question: "能执行命令意味着能造成真实影响。审批、沙箱、版本控制和最小权限开始成为日常使用的一部分。",
+      sources: [
+        { label: "Claude Code 官方发布", href: "https://www.anthropic.com/news/claude-3-7-sonnet" }
+      ]
+    }
   },
   {
     date: "2025 年 3 月",
-    title: "Manus 带火通用 AI Agent",
-    concept: "General Agent / 虚拟电脑 / 任务交付",
-    summary: "Manus 的传播让公众看到另一种 Agent：不是只回答问题，而是在独立环境中浏览网页、整理资料、生成文件并交付结果。Coding Agent 与通用 Agent 的边界开始变薄。",
-    impact: "人们开始按“最终交付物”而不是“回答得像不像人”评价 AI。软件开发也被放进更长的研究、设计和发布链路里。",
-    question: "长链路任务会累积错误。过程不可见、来源不清楚或无法回滚时，一个漂亮结果并不足以证明任务完成。",
-    sources: [
-      { label: "Manus 官方回顾", href: "https://manus.im/blog/what-we-saw-in-the-past-three-months-and-what-we-see-in-the-future" }
-    ]
+    model: {
+      title: "Gemini 2.5 Pro：Thinking 与代码能力结合",
+      concept: "Thinking model / 代码 / 长上下文",
+      summary: "Google 将 Gemini 2.5 Pro 定义为会在回答前推理的 Thinking model，并把复杂推理和代码能力作为核心场景。",
+      impact: "模型厂商开始把“能否完成长链路、工具辅助的任务”作为重要能力，而不是只比较单轮聊天表现。",
+      question: "长上下文与推理能力能减少中断，却也可能掩盖错误假设；上下文中的资料质量仍决定结果的上限。",
+      sources: [
+        { label: "Gemini 2.5 Pro 官方发布", href: "https://blog.google/innovation-and-ai/models-and-research/google-deepmind/gemini-model-thinking-updates-march-2025/" }
+      ]
+    },
+    agent: {
+      title: "Manus 带火通用 AI Agent",
+      concept: "General Agent / 虚拟电脑 / 任务交付",
+      summary: "Manus 的传播让公众看到另一种 Agent：不是只回答问题，而是在独立环境中浏览网页、整理资料、生成文件并交付结果。Coding Agent 与通用 Agent 的边界开始变薄。",
+      impact: "人们开始按“最终交付物”而不是“回答得像不像人”评价 AI。软件开发也被放进更长的研究、设计和发布链路里。",
+      question: "长链路任务会累积错误。过程不可见、来源不清楚或无法回滚时，一个漂亮结果并不足以证明任务完成。",
+      sources: [
+        { label: "Manus 官方回顾", href: "https://manus.im/blog/what-we-saw-in-the-past-three-months-and-what-we-see-in-the-future" }
+      ]
+    }
   },
   {
     date: "2025 年 4 月至 6 月",
-    title: "Coding Agent 集体爆发",
-    concept: "CLI / 云端沙箱 / PR Agent",
-    summary: "Codex CLI 与云端 Codex、GitHub Copilot Coding Agent、Gemini CLI、OpenCode 等相继受到关注。产品形态逐渐稳定为三类：本地终端协作、云端并行任务、Issue 到 Pull Request 的后台代理。",
-    impact: "Agent 不再绑定某一个编辑器或模型。团队开始组合本地反馈速度、云端隔离执行和 GitHub 审查流程。",
-    question: "产品名称越来越多，但选型不能只看榜单。数据是否出网、能否使用企业模型、如何审查变更更值得优先比较。",
-    sources: [
-      { label: "Codex", href: "https://openai.com/index/introducing-codex/" },
-      { label: "Copilot Coding Agent", href: "https://github.blog/news-insights/product-news/github-copilot-meet-the-new-coding-agent/" },
-      { label: "Gemini CLI", href: "https://blog.google/innovation-and-ai/technology/developers-tools/introducing-gemini-cli-open-source-ai-agent/" }
-    ]
+    agent: {
+      title: "Coding Agent 集体爆发",
+      concept: "CLI / 云端沙箱 / PR Agent",
+      summary: "Codex CLI 与云端 Codex、GitHub Copilot Coding Agent、Gemini CLI、OpenCode 等相继受到关注。产品形态逐渐稳定为三类：本地终端协作、云端并行任务、Issue 到 Pull Request 的后台代理。",
+      impact: "Agent 不再绑定某一个编辑器或模型。团队开始组合本地反馈速度、云端隔离执行和 GitHub 审查流程。",
+      question: "产品名称越来越多，但选型不能只看榜单。数据是否出网、能否使用企业模型、如何审查变更更值得优先比较。",
+      sources: [
+        { label: "Codex", href: "https://openai.com/index/introducing-codex/" },
+        { label: "Copilot Coding Agent", href: "https://github.blog/news-insights/product-news/github-copilot-meet-the-new-coding-agent/" },
+        { label: "Gemini CLI", href: "https://blog.google/innovation-and-ai/technology/developers-tools/introducing-gemini-cli-open-source-ai-agent/" }
+      ]
+    }
+  },
+  {
+    date: "2025 年 7 月至 8 月",
+    model: {
+      title: "GLM‑4.5 与 Kimi K2：开放权重转向 Agent 任务",
+      concept: "开源权重 / Coding / Tool use",
+      summary: "GLM‑4.5 将推理、代码和 Agent 任务作为一体能力发布；Kimi K2 也以工具调用和自主解决问题为重点。这两次发布让中文开放模型更直接进入 Coding Agent 的可选模型清单。",
+      impact: "企业可以在开源权重、兼容 API 与不同终端工具之间组合，减少工作流对单一闭源模型的绑定。",
+      question: "“开放”不代表部署成本低，也不代表工具调用完全兼容。推理资源、许可证、协议差异和运维能力都要先验证。",
+      sources: [
+        { label: "GLM‑4.5 官方发布", href: "https://z.ai/blog/glm-4.5" },
+        { label: "Kimi K2 官方项目", href: "https://github.com/MoonshotAI/Kimi-K2" }
+      ]
+    },
+    agent: {
+      title: "OpenCode：模型可替换的终端工作台",
+      concept: "兼容 API / 本地优先 / 工具协议",
+      summary: "终端型 Agent 不再只服务于一家模型。以兼容 API 为接口的工具，把模型提供方、执行环境和工程流程拆成可以分别选择的部件。",
+      impact: "这也解释了本教程为何以 OpenCode 与企业兼容 API 为主线：练习的是可迁移的工作流，而不是某个单一产品的按钮。",
+      question: "可替换不等于无差异。不同模型的上下文、工具调用和安全策略不同，切换后应重新跑关键任务与测试。",
+      sources: [
+        { label: "OpenCode 官方项目", href: "https://github.com/anomalyco/opencode" }
+      ]
+    }
   },
   {
     date: "2025 年 10 月至 12 月",
-    title: "Agent Skills 成为新热词",
-    concept: "SKILL.md / 渐进加载 / 开放标准",
-    summary: "Agent Skills 把说明、参考资料与脚本放进一个可发现的目录。Agent 先看到名称和描述，真正需要时才读取完整内容。12 月，Skills 进一步成为跨产品的开放标准。",
-    impact: "关注点从“写一句万能 Prompt”转向“把团队经验变成可测试、可版本化、可共享的能力”。工作方法开始像代码一样被维护。",
-    question: "Skill 可能包含脚本和外部依赖。安装社区 Skill 前，必须检查它会读取什么、运行什么、连接哪里。",
-    sources: [
-      { label: "Agent Skills 官方介绍", href: "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills" }
-    ]
+    model: {
+      title: "DeepSeek‑V3.2：面向 Agent 的开放模型继续迭代",
+      concept: "开放模型 / 推理优先 / Agent",
+      summary: "DeepSeek 在 12 月发布 V3.2。官方将其列为面向 Agent 的推理优先模型，显示开放模型的竞争重点已从一般对话扩展到工具使用和复杂任务。",
+      impact: "对团队而言，模型评估开始同时看推理、代码、工具调用与运行成本，而不是只看单一聊天体验。",
+      question: "公开发布并不能替代内部评测。涉及企业代码时，还需确认部署方式、数据流和实际任务上的稳定性。",
+      sources: [
+        { label: "DeepSeek 透明度中心", href: "https://www.deepseek.com/en/transparency/" }
+      ]
+    },
+    agent: {
+      title: "Agent Skills 成为新热词",
+      concept: "SKILL.md / 渐进加载 / 开放标准",
+      summary: "Agent Skills 把说明、参考资料与脚本放进一个可发现的目录。Agent 先看到名称和描述，真正需要时才读取完整内容。12 月，Skills 进一步成为跨产品的开放标准。",
+      impact: "关注点从“写一句万能 Prompt”转向“把团队经验变成可测试、可版本化、可共享的能力”。工作方法开始像代码一样被维护。",
+      question: "Skill 可能包含脚本和外部依赖。安装社区 Skill 前，必须检查它会读取什么、运行什么、连接哪里。",
+      sources: [
+        { label: "Agent Skills 官方介绍", href: "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills" }
+      ]
+    }
   },
   {
     date: "2026 年 1 月至 2 月",
-    title: "OpenClaw 与长期运行 Agent",
-    concept: "常驻 Agent / 持久记忆 / 消息渠道",
-    summary: "OpenClaw 从 Clawdbot、Moltbot 更名后迅速传播。它通过消息应用接受任务，连接浏览器、文件、邮件和日历，并能持续运行。Agent 从一次 coding session 扩展成了个人计算环境的一部分。",
-    impact: "Skills、记忆、定时任务和多渠道连接组合到一起，展示了“自己的 Agent”可以是什么样子。",
-    question: "常驻 Agent 拥有更长时间和更大权限，也更容易受到 Prompt Injection、凭证泄露和错误自动化影响。",
-    sources: [
-      { label: "OpenClaw 官方项目", href: "https://github.com/openclaw/openclaw" }
-    ]
+    model: {
+      title: "Claude Opus 4.6：更长时间的 Agentic Coding",
+      concept: "代码审查 / 调试 / 1M 上下文",
+      summary: "Anthropic 在 Claude Opus 4.6 发布中明确强调：它能更仔细地规划，在更大代码库中持续执行 Agent 任务，并改进代码审查和调试。",
+      impact: "闭源前沿模型的重点从“写出一段代码”进一步转向在大型工程中保持任务连续性和自我纠错。",
+      question: "持续执行时间越长，越需要把权限、停止条件和可回滚的中间产物设计进工作流。",
+      sources: [
+        { label: "Claude Opus 4.6 官方发布", href: "https://www.anthropic.com/news/claude-opus-4-6" }
+      ]
+    },
+    agent: {
+      title: "OpenClaw 与长期运行 Agent",
+      concept: "常驻 Agent / 持久记忆 / 消息渠道",
+      summary: "OpenClaw 从 Clawdbot、Moltbot 更名后迅速传播。它通过消息应用接受任务，连接浏览器、文件、邮件和日历，并能持续运行。Agent 从一次 coding session 扩展成了个人计算环境的一部分。",
+      impact: "Skills、记忆、定时任务和多渠道连接组合到一起，展示了“自己的 Agent”可以是什么样子。",
+      question: "常驻 Agent 拥有更长时间和更大权限，也更容易受到 Prompt Injection、凭证泄露和错误自动化影响。",
+      sources: [
+        { label: "OpenClaw 官方项目", href: "https://github.com/openclaw/openclaw" }
+      ]
+    }
   },
   {
     date: "2026 年至今",
-    title: "Multi-Agent 与 Agentic Engineering",
-    concept: "并行 Agent / Worktree / 自动化 / 监督",
-    summary: "Codex App 等产品开始让用户同时指挥多个 Agent，在隔离 worktree 中并行工作。讨论也从 Vibe Coding 走向 Agentic Engineering：不再只强调表达想法，而是强调任务拆解、约束、测试和审查。",
-    impact: "人的主要工作从逐行输入代码转向定义问题、设计接口、判断证据和承担最终责任。",
-    question: "并行并不会自动提高质量。没有清晰边界的多 Agent，只会更快地产生冲突、重复和不可审查的修改。",
+    model: {
+      title: "Claude Fable 5：长周期 Coding Agent",
+      concept: "长任务 / 子 Agent / 自我测试",
+      summary: "Anthropic 将 Claude Fable 5 定位为可处理数日复杂、异步任务的第五代模型，并明确把软件工程、Claude Code 与多 Agent 协作作为主要使用场景。",
+      impact: "模型能力的讨论从“能不能写出来”进一步转向“能否在较少监督下持续完成大工程”，也让停止条件、审查和安全护栏变得更关键。",
+      question: "一个可运行数日的 Agent，何时应该自主推进，何时必须停下来等待人的审批？",
+      sources: [
+        { label: "Claude Fable 5 官方发布", href: "https://www.anthropic.com/news/claude-fable-5-mythos-5" }
+      ]
+    },
+    agent: {
+      title: "Multi-Agent 与 Agentic Engineering",
+      concept: "并行 Agent / Worktree / 自动化 / 监督",
+      summary: "Codex App 等产品开始让用户同时指挥多个 Agent，在隔离 worktree 中并行工作。讨论也从 Vibe Coding 走向 Agentic Engineering：不再只强调表达想法，而是强调任务拆解、约束、测试和审查。",
+      impact: "人的主要工作从逐行输入代码转向定义问题、设计接口、判断证据和承担最终责任。",
+      question: "并行并不会自动提高质量。没有清晰边界的多 Agent，只会更快地产生冲突、重复和不可审查的修改。",
+      sources: [
+        { label: "Codex App 官方发布", href: "https://openai.com/index/introducing-the-codex-app/" }
+      ]
+    }
+  }
+];
+
+export const modelReleases2026 = {
+  deepSeekV4: {
+    title: "DeepSeek‑V4：兼容接口进入新一代开放模型",
+    concept: "V4‑Pro / V4‑Flash / OpenAI 与 Anthropic 兼容",
+    summary: "DeepSeek 在 4 月发布 V4，并提供 V4‑Pro 与 V4‑Flash。官方 API 同时支持 OpenAI Chat Completions 与 Anthropic 接口，模型的替换成本继续下降。",
+    impact: "对终端 Agent 使用者来说，模型竞争不只发生在能力榜单，也发生在是否能以较小迁移成本接入现有工作流。",
+    question: "协议兼容解决了接入问题，却不能保证行为一致；切换模型后，哪些关键任务必须重新评测？",
     sources: [
-      { label: "Codex App 官方发布", href: "https://openai.com/index/introducing-the-codex-app/" }
+      { label: "DeepSeek‑V4 官方更新", href: "https://api-docs.deepseek.com/updates" }
+    ]
+  },
+  glm52: {
+    title: "GLM‑5.2：为长周期工程任务而生",
+    concept: "1M 上下文 / Coding Agent / MIT 开源",
+    summary: "Z.AI 在 6 月发布 GLM‑5.2，重点是可稳定维持长周期任务的 1M 上下文、可调节的推理强度，以及面向 Coding Agent 的能力；模型同时提供 MIT 开源许可。",
+    impact: "它把“长上下文”从参数竞争拉回真实工程轨迹：长任务能否持续保持代码、工具调用与调试质量，才是 Agent 实用性的关键。",
+    question: "上下文窗口变大后，团队怎样避免把无关资料和历史错误一起带进 Agent 的长期轨迹？",
+    sources: [
+      { label: "GLM‑5.2 官方发布", href: "https://z.ai/blog/glm-5.2" }
+    ]
+  },
+  gpt56: {
+    title: "GPT‑5.6：模型族直接进入 Codex",
+    concept: "Sol / Terra / Luna / ChatGPT / Codex / API",
+    summary: "OpenAI 在 7 月正式发布 GPT‑5.6 系列：旗舰 Sol、均衡的 Terra 与高效的 Luna，并同时提供给 ChatGPT、Codex 和 API。",
+    impact: "Coding 工作流开始更明确地按任务难度、成本与所需推理强度选择模型，而不是固定使用同一个旗舰。",
+    question: "当同一家提供多档模型时，团队如何定义升级策略、成本上限与回归评测？",
+    sources: [
+      { label: "GPT‑5.6 官方发布", href: "https://openai.com/index/gpt-5-6/" }
+    ]
+  },
+  kimiK3: {
+    title: "Kimi K3：开放前沿模型走进 Kimi Code",
+    concept: "开放前沿 / Kimi Code / API",
+    summary: "Moonshot 在 7 月发布 Kimi K3，并把它提供到 Kimi、Kimi Work、Kimi Code 与 Kimi API。官方将其定位为开放前沿智能模型，也把 Coding 放进主要评测与使用场景。",
+    impact: "它让 2026 年的模型竞争更清楚地呈现为：闭源模型继续拉长自主任务，开放模型同时追赶代码、上下文和工具调用能力。",
+    question: "模型开放后的真正门槛在哪里：权重、推理资源、服务容量，还是适配工具链和安全治理的能力？",
+    sources: [
+      { label: "Kimi K3 官方发布", href: "https://www.kimi.com/blog/kimi-k3" }
     ]
   }
+};
+
+export const timelineEvents = [
+  { date: "2025 年 1 月 20 日", sort: "2025-01-20", model: milestones[0].model },
+  { date: "2025 年 2 月 2 日", sort: "2025-02-02", agent: milestones[0].agent },
+  {
+    date: "2025 年 2 月 24 日",
+    sort: "2025-02-24",
+    model: milestones[1].model,
+    agent: milestones[1].agent
+  },
+  { date: "2025 年 3 月 5 日", sort: "2025-03-05", agent: milestones[2].agent },
+  { date: "2025 年 3 月 25 日", sort: "2025-03-25", model: milestones[2].model },
+  { date: "2025 年 5 月至 6 月", sort: "2025-05-15", agent: milestones[3].agent },
+  { date: "2025 年 7 月", sort: "2025-07-15", agent: milestones[4].agent },
+  { date: "2025 年 7 月至 8 月", sort: "2025-07-28", model: milestones[4].model },
+  { date: "2025 年 10 月至 12 月", sort: "2025-10-16", agent: milestones[5].agent },
+  { date: "2025 年 12 月 1 日", sort: "2025-12-01", model: milestones[5].model },
+  { date: "2026 年 1 月至 2 月", sort: "2026-01-20", agent: milestones[6].agent },
+  { date: "2026 年 2 月 5 日", sort: "2026-02-05", model: milestones[6].model },
+  { date: "2026 年 2 月至今", sort: "2026-02-20", agent: milestones[7].agent },
+  { date: "2026 年 4 月 24 日", sort: "2026-04-24", model: modelReleases2026.deepSeekV4 },
+  { date: "2026 年 6 月 9 日", sort: "2026-06-09", model: milestones[7].model },
+  { date: "2026 年 6 月 16 日", sort: "2026-06-16", model: modelReleases2026.glm52 },
+  { date: "2026 年 7 月 9 日", sort: "2026-07-09", model: modelReleases2026.gpt56 },
+  { date: "2026 年 7 月 16 日", sort: "2026-07-16", model: modelReleases2026.kimiK3 }
 ];
 
 2025 年之前，AI 编程已经经历了补全、聊天和编辑器集成。但这本手册从 2025 年开始，因为这一年发生了一个更重要的变化：**模型不再只给建议，它开始在真实的软件环境里采取行动。**
 
-这条时间轴不试图记录每次模型升级，也不拿关注度当作能力证明。我们只保留那些改变工作单位、协作接口或责任边界的节点。
+这条时间轴不试图记录每次模型升级，也不拿关注度当作能力证明。左侧只保留 DeepSeek、GLM、Kimi，以及 Claude、GPT、Gemini 这六个模型家族中改变 Coding 工作方式的发布；右侧保留改变工作单位、协作接口或责任边界的节点。
 
-<Timeline events={events} />
+<Timeline events={timelineEvents} />
 
 ## 一条线索：工作单位不断变大
 
@@ -132,10 +290,6 @@ export const events = [
 3. 让 Agent 展示计划、差异、命令和测试结果；
 4. 给高风险动作设置审批与最小权限；
 5. 用 Git、测试和日志保留回退与追溯路径。
-
-<Callout type="warning" title="热度不是选型标准">
-  DeepSeek、Claude Code、Manus、Skills 和 OpenClaw 在不同时间引发大量讨论，但它们解决的问题并不相同。不要因为一个名字火热，就把它塞进所有工作流。先问：它改变的是模型、执行环境、知识复用，还是长期自动化？
-</Callout>
 
 ## 从“忘掉代码”到“对结果负责”
 

@@ -1,0 +1,69 @@
+---
+title: "Loop Engineering：设计可验证的 Agent 循环"
+description: "把一次 Prompt 扩展为有触发、状态、验证、停止和人工闸门的可重复 Agent 工作循环。"
+section: methods
+order: 5
+estimatedMinutes: 15
+prerequisites: ["理解 Harness Engineering"]
+outcomes:
+  - "区分单次 Prompt、Agent 内部循环和外部工作循环"
+  - "为循环写出目标、状态、验证和停止条件"
+  - "在失败或无进展时安全恢复，而不是无限重试"
+tags: ["Loop Engineering", "Ralph Loop", "自动化", "停止条件"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["IBM Loop Engineering 介绍", "Loop Engineering 研究论文"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+Loop Engineering 是一个正在形成的 Agent 工程概念：关注任务怎样发现、执行、观察、验证、记录并安全停止。它不是普通的 `for` 循环，也不是让 Agent 无限制运行。
+
+## 一个可审查的循环
+
+```text
+触发：出现明确 Issue
+目标：修复并验证一个用户可复现的问题
+发现：读取规格、代码、测试和最近 Diff
+行动：在隔离工作区做最小修改
+观察：运行测试、构建或浏览器路径
+判断：证据是否满足验收？
+停止：通过、阻塞、需人工决定，或达到预算/次数上限
+记录：保存状态、命令、结果和剩余风险
+```
+
+## Loop 的五个字段
+
+| 字段 | 问题 |
+| --- | --- |
+| 触发器 | 什么事件允许循环开始？ |
+| 目标 | 最终环境状态必须是什么？ |
+| 验证器 | 哪些测试、评测或人工检查能证明它？ |
+| 停止规则 | 通过、阻塞、超时、预算耗尽时如何停？ |
+| 状态记忆 | 下一次运行如何知道已经做过什么？ |
+
+失败时先写复现卡片，找到第一个非警告错误、对应文件和命令阶段，再要求 Agent 只读分析。不要用递归删除、硬重置或无限重试掩盖不确定性。
+
+## 现在最常被拿来讨论的 Loop Skill
+
+下面这些案例不是“最佳 Skill 排行榜”，而是目前公开资料中最容易看到、也最能说明循环结构的几种实现。它们共同的重点不是让 Agent 多跑几轮，而是让每一轮都留下状态和证据：
+
+| Skill / 工作流 | 循环结构 | 借鉴点 |
+| --- | --- | --- |
+| [Claude Code `/loop`](https://support.claude.com/en/articles/14554000-claude-code-power-user-tips) | 定时触发 → 执行任务 → 检查结果 → 等待下一轮 | 适合周期性检查；先定义频率、幂等性和停止方式 |
+| [Ralph Loop](https://ralph-cli.dev/docs/core-concepts/ralph-loop/) | PRD/任务队列 → 单任务迭代 → 验证与重试 → 持久化进度 | 把“继续做”变成有任务边界、验证命令和会话记忆的循环 |
+| [autoresearch Skill](https://github.com/uditgoenka/autoresearch)（受 [Karpathy autoresearch](https://github.com/karpathy/autoresearch) 启发） | 设定目标与机械指标 → 修改 → 实验/评估 → 保留或回滚 → 继续迭代 | 把“改一点、测一下、只保留更好结果”变成跨 Coding、内容和研究任务的通用循环 |
+
+这些 Skill 可以作为设计参考，但不应直接复制到企业环境。安装前应审查触发条件、脚本和权限；运行时要限制仓库范围、命令集合、次数、预算和网络访问，并保留每轮的测试输出或评测记录。Anthropic 的文档也将 Skill 定位为可按需触发的工作流，而不是每次会话都注入的常驻背景。
+
+<Callout type="warning" title="Ralph Loop 不是无限重试">
+  社区常把反复计划、实现、检查的 Agent 工作方式称为 Ralph Loop。课程只把它作为循环模式的例子：每一轮必须有新证据、退出条件和人工升级路径。
+</Callout>
+
+<Checklist id="methods-loop" items={[
+  "循环写清触发器、目标、验证器、停止规则和状态记忆",
+  "我能区分 Agent 内部循环与外部可调度工作循环",
+  "失败时先复现和定位根因，不用无限重试掩盖问题",
+  "循环有预算、超时、人工升级和可恢复状态"
+]} />

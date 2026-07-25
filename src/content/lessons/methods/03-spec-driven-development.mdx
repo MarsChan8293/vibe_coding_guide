@@ -1,0 +1,64 @@
+---
+title: "Spec-Driven Development：先写规格，再让 Agent 实现"
+description: "把需求、约束和验收写成可持续的规格，让代码、测试和评审围绕同一份依据演进。"
+section: methods
+order: 3
+estimatedMinutes: 13
+prerequisites: ["掌握 Context Engineering"]
+outcomes:
+  - "区分一次 Prompt 与可持续的规格文件"
+  - "为功能写出行为、边界和验收标准"
+  - "让 Agent 按规格拆计划、实现并验证"
+tags: ["Spec-Driven Development", "规格", "验收"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["JetBrains / DeepLearning.AI Spec-Driven Development 课程", "GitHub Spec Kit"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+Spec-Driven Development（SDD）把“凭感觉让 Agent 写代码”改成“先写可审查规格，再让 Agent 生成计划、代码和测试”。规格要成为人、Agent 和验收之间的共同依据。
+
+## 可借鉴的 Spec 工作流
+
+[GitHub Spec Kit](https://github.github.com/spec-kit/) 是一个 Toolkit，不是单个 `SKILL.md`。它把流程组织为 `Spec → Plan → Tasks → Implement`，并为不同 Coding Agent 提供集成。使用时应保留规格、计划和任务之间的链接，避免只安装命令却丢掉审查过程。
+
+## 一份最小功能规格
+
+```md
+# 搜索结果子路径跳转
+## 用户结果
+用户在生产站点搜索课程后，点击结果可以进入正确的深层 URL。
+## 约束
+- base 路径是 /vibe_coding_guide/
+- 不更换 Pagefind，不新增登录
+## 验收
+- 输入“API Key”能返回配置课程
+- 点击结果后 URL 仍包含仓库子路径
+- npm test 和浏览器搜索测试通过
+## 不在本次范围
+- 搜索排序重构
+```
+
+## 规格驱动的顺序
+
+1. 人确认用户结果、约束和不做什么；
+2. Agent 读取规格并列出事实与假设；
+3. 人审查计划，特别是架构和依赖决定；
+4. Agent 按小任务实现，把测试映射到验收条目；
+5. 人用结果和证据检查规格是否满足；
+6. 发现新事实时更新规格，而不是只修代码。
+
+<Callout type="warning" title="规格不是一次性文档">
+  代码和规格会一起变化。过时的规格比没有规格更危险，因为 Agent 会自信地执行旧约束。
+</Callout>
+
+功能跨多个模块、有公共接口、需要交接或验收不止是“看起来对”时，值得写规格。小文案和明确常量可以只用 Prompt，但仍要有可观察验收。
+
+<Checklist id="methods-spec" items={[
+  "规格写清用户结果、约束、验收和不在范围内的事项",
+  "我会在人审查规格和计划后才让 Agent 修改",
+  "测试用例可以映射回规格中的验收条目",
+  "发现新事实时会同步更新规格"
+]} />

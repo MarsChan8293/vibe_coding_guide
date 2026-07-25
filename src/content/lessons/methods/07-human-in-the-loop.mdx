@@ -1,0 +1,56 @@
+---
+title: "Human-in-the-Loop：把决定权留在人类一侧"
+description: "为高风险动作设置人工审批、权限边界和升级路径，让 Agent 的自主性始终处在可控制范围内。"
+section: methods
+order: 7
+estimatedMinutes: 14
+prerequisites: ["完成一次测试驱动的实现循环"]
+outcomes:
+  - "识别必须由人批准的 Agent 动作"
+  - "设计最小权限、审批和停止开关"
+  - "处理 Prompt Injection、凭证和供应链风险"
+tags: ["Human-in-the-Loop", "权限", "Prompt Injection", "安全"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["Anthropic Agent 安全工程文章", "Agent Skills 安全建议"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+Human-in-the-Loop 不是每一步都让人点确认，而是把人的判断放在真正改变风险、责任或业务结果的节点。低风险的搜索、测试和格式化可以自动化；删除、发布、发送消息、访问生产数据和处理凭证必须有人工闸门。
+
+## 可借鉴的人工检查点工作流
+
+[Superpowers 的 `subagent-driven-development` 与 `executing-plans`](https://github.com/obra/superpowers) 将任务拆成批次，在继续下一批前要求人工检查计划符合性、代码质量或关键证据。它们适合作为人工闸门的示例；企业还应结合自己的权限策略，明确哪些文件、命令和外部系统必须人工批准。
+
+## 五个必须保留人工判断的节点
+
+| 节点 | 人要确认什么 |
+| --- | --- |
+| 需求与规格 | 目标、范围和业务含义是否正确 |
+| 权限升级 | Agent 是否真的需要更多权限 |
+| 高风险动作 | 删除、迁移、发布或外发是否获批 |
+| 结果验收 | 测试之外，用户是否得到想要的结果 |
+| 异常升级 | 失败、越权、注入或数据事件由谁接管 |
+
+## 主要风险面
+
+- **Prompt Injection**：外部网页、Issue、README 或依赖文档中的指令不能自动获得信任。
+- **凭证与数据**：Key、Token、SSH 密钥和客户数据不能进入代码、日志、截图或聊天。
+- **软件供应链**：安装模型生成的包前检查来源、维护状态、锁文件和许可证。
+- **过度权限**：工作区写权限、系统写权限和无限网络不是同一级别。
+
+<Callout type="warning" title="审批不是信任模型，而是控制影响范围">
+  即使模型能力很强，也要让每个高风险动作可暂停、可回溯、可撤销。不要用“它通常很可靠”替代权限和审计设计。
+</Callout>
+
+团队基线应包含批准的工具与 Provider、数据分类、默认权限、Skill/MCP 审计、合并与发布门槛、事件响应人和更新后的回归试点。
+
+<Checklist id="methods-human" items={[
+  "我能指出哪些动作必须人工批准",
+  "外部网页、Issue 与 Skill 默认按不可信输入处理",
+  "凭证不进入代码、日志、截图和聊天",
+  "Agent 有最小权限、停止开关和异常升级路径",
+  "发布与生产操作不会因为测试变绿而自动放行"
+]} />
