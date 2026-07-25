@@ -110,7 +110,7 @@ a {
   gap: .7rem;
   margin: 0 0 1rem;
   color: var(--red-dark);
-  font: 700 .72rem/1 var(--mono);
+  font: 700 .76rem/1 var(--mono);
   letter-spacing: .14em;
   text-transform: uppercase;
 }
@@ -132,7 +132,7 @@ a {
   border: 1px solid var(--ink);
   color: var(--paper);
   background: var(--ink);
-  font: 700 .78rem/1 var(--mono);
+  font: 700 .84rem/1 var(--mono);
   text-decoration: none;
   box-shadow: 5px 5px 0 var(--red);
   transition: transform .18s ease, box-shadow .18s ease;
@@ -238,7 +238,7 @@ a {
   border: 1px solid #66685b;
   color: #efeee4;
   background: #25261f;
-  font: 600 .65rem/1 var(--mono);
+  font: 600 .72rem/1 var(--mono);
   cursor: pointer;
 }
 
