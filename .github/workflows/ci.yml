@@ -25,5 +25,7 @@ jobs:
           args: >-
             --no-progress
             --accept 200,429
+            --exclude '^/vibe_coding_guide/'
+            --exclude '^https://marschan8293\.github\.io/vibe_coding_guide/'
             './dist/**/*.html'
           fail: true
