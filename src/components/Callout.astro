@@ -1,0 +1,54 @@
+---
+interface Props {
+  type?: "note" | "warning" | "enterprise" | "checkpoint";
+  title?: string;
+}
+
+const { type = "note", title = "旁注" } = Astro.props;
+---
+
+<aside class:list={["callout", `callout-${type}`]}>
+  <p class="callout-label">{title}</p>
+  <div class="callout-body"><slot /></div>
+</aside>
+
+<style>
+  .callout {
+    margin: 2.3rem 0;
+    padding: 1.2rem 1.35rem;
+    border: 1px solid var(--ink);
+    border-left-width: 7px;
+    background: rgba(255,255,255,.27);
+  }
+
+  .callout-warning {
+    border-left-color: var(--red);
+    background: rgba(201,66,44,.07);
+  }
+
+  .callout-enterprise {
+    border-left-color: var(--blue);
+    background: rgba(49,77,103,.07);
+  }
+
+  .callout-checkpoint {
+    border-left-color: var(--olive);
+    background: rgba(90,105,70,.08);
+  }
+
+  .callout-label {
+    margin: 0 0 .4rem;
+    color: var(--red-dark);
+    font: 750 .68rem/1 var(--mono);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .callout-body :global(p:first-child) {
+    margin-top: 0;
+  }
+
+  .callout-body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+</style>

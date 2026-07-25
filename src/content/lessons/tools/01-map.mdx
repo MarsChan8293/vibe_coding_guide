@@ -1,0 +1,74 @@
+---
+title: "先看地图，再选工具"
+description: "用交互位置、执行地点和责任边界理解 AI 编程工具，而不是追逐一张不断过期的排行榜。"
+section: tools
+order: 1
+estimatedMinutes: 10
+prerequisites: ["读完历史时间轴"]
+outcomes:
+  - "分辨编辑器型、终端型与云端型 Coding Agent"
+  - "用企业约束而不是热度筛选工具"
+  - "理解模型、Agent 工具和执行环境不是同一层"
+tags: ["工具分类", "选型"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["OpenCode", "Claude Code", "Codex", "GitHub Copilot 官方文档"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+很多人第一次挑 AI 编程工具，会先问“哪一个最强”。这像问“哪一种交通工具最好”：不说明路程、载重、预算和是否需要自己驾驶，答案没有意义。
+
+先把工具拆成三层：
+
+| 层 | 回答的问题 | 例子 |
+| --- | --- | --- |
+| 模型 | 谁负责理解与生成？ | 企业内部模型、Claude、GPT、Gemini |
+| Agent / Harness | 谁组织上下文、调用工具、循环执行？ | OpenCode、Claude Code、Codex CLI |
+| 执行环境 | 代码在哪里被读取、运行与测试？ | 本地终端、IDE、云端沙箱、GitHub Actions |
+
+同一个模型放进不同 Agent，使用体验和安全边界可能完全不同；同一个 Agent 连接不同模型，能力、速度和成本也会变化。
+
+## 三种常见形态
+
+### 编辑器型：看得见、改得近
+
+Cursor、GitHub Copilot 等把聊天、补全和多文件修改放在编辑器中。优点是文件、Diff 和诊断信息都在熟悉的界面里；缺点是产品通常与特定编辑器生态、账号体系或云服务绑定。
+
+适合：已经习惯图形化 IDE、需要频繁手工调整代码的人。
+
+### 终端型：组合自由、离工程最近
+
+OpenCode、Claude Code、Codex CLI、Gemini CLI 直接在项目终端工作。它们天然能够使用 Git、测试命令和脚本，也更容易接入企业模型 API。
+
+适合：Linux 环境、模型需要替换、希望把工作流写成脚本或规则的团队。
+
+### 云端型：让任务在后台并行
+
+云端 Agent 会克隆仓库，在隔离环境里完成任务，并通过 Diff 或 Pull Request 交付。它适合耗时任务和多人协作，但代码、依赖和日志会进入云端环境。
+
+适合：已有 GitHub 审查流程、允许代码进入指定云服务的团队。
+
+<Callout type="enterprise" title="企业判断顺序">
+  先确认数据能否出网、模型从哪里调用、凭证如何托管、命令是否需要审批；这些问题解决后，再比较界面和模型效果。
+</Callout>
+
+## 为什么本教程选择 OpenCode
+
+本教程的客户环境已经提供 OpenAI 兼容 API。OpenCode 的价值不在于“永远排名第一”，而在于它是开源终端 Agent，模型提供商可配置，适合 Linux 和企业模型网关。
+
+我们的主线因此是：
+
+> 企业模型 API → OpenCode → 本地项目 → Git 与测试 → GitHub Pages
+
+其他工具会被介绍，但不会在实践中来回切换。统一主线能让零基础读者把注意力留给任务方法，而不是反复适应界面。
+
+<Checklist
+  id="tools-map"
+  items={[
+    "我能区分模型、Agent 与执行环境",
+    "我知道本地终端与云端 Agent 的数据边界不同",
+    "我理解主推 OpenCode 是基于场景，而不是宣称它永远最强"
+  ]}
+/>

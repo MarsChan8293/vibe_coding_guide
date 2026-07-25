@@ -1,0 +1,196 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { BASE } from "../../lib/site";
+---
+
+<BaseLayout title="站内搜索" description="搜索 Vibe Coding 教程中的概念、命令和故障排查。">
+  <section class="search-page site-shell" data-pagefind-ignore>
+    <header>
+      <p class="eyebrow">Index / Search</p>
+      <h1>找一个概念、<br />命令或报错。</h1>
+      <p>搜索索引完全在浏览器中运行。没有搜索记录会离开你的电脑。</p>
+    </header>
+    <form class="search-form" role="search">
+      <label for="search-input">输入关键词</label>
+      <div>
+        <input id="search-input" type="search" autocomplete="off" placeholder="例如：API Key、Git、验收标准" />
+        <button type="submit">搜索</button>
+      </div>
+    </form>
+    <div id="search-status" aria-live="polite"></div>
+    <ol id="search-results"></ol>
+  </section>
+
+  <script is:inline define:vars={{ base: BASE }}>
+    const form = document.querySelector(".search-form");
+    const input = document.querySelector("#search-input");
+    const status = document.querySelector("#search-status");
+    const results = document.querySelector("#search-results");
+    let pagefind;
+
+    const loadPagefind = async () => {
+      if (!pagefind) {
+        pagefind = await import(`${base}pagefind/pagefind.js`);
+        await pagefind.options({ baseUrl: base });
+        await pagefind.init();
+      }
+      return pagefind;
+    };
+
+    const search = async (query) => {
+      if (!query.trim()) {
+        status.textContent = "";
+        results.innerHTML = "";
+        return;
+      }
+      status.textContent = "正在查找…";
+      try {
+        const api = await loadPagefind();
+        const response = await api.search(query);
+        const data = await Promise.all(response.results.slice(0, 20).map((item) => item.data()));
+        status.textContent = `找到 ${response.results.length} 条结果`;
+        results.innerHTML = data.map((item) => `
+          <li>
+            <a href="${item.url}">
+              <strong>${item.meta.title || "未命名页面"}</strong>
+              <span>${item.excerpt}</span>
+            </a>
+          </li>
+        `).join("");
+      } catch (error) {
+        status.textContent = "搜索索引仅在生产构建后可用，请先运行 npm run build。";
+      }
+    };
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      search(input.value);
+    });
+    let debounce;
+    input.addEventListener("input", () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(() => search(input.value), 220);
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .search-page {
+    min-height: 65vh;
+    padding-block: 5rem;
+  }
+
+  header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: end;
+    gap: 3rem;
+    margin-bottom: 4rem;
+  }
+
+  h1 {
+    margin: 0;
+    font: 760 clamp(3.2rem, 7vw, 7rem)/.98 var(--serif);
+    letter-spacing: -.055em;
+  }
+
+  header > p:last-child {
+    color: var(--muted);
+    font-size: .9rem;
+  }
+
+  .search-form {
+    max-width: 950px;
+    padding: 1.5rem;
+    border: 1px solid var(--ink);
+    background: rgba(255,255,255,.24);
+  }
+
+  label {
+    display: block;
+    margin-bottom: .8rem;
+    font: 700 .7rem/1 var(--mono);
+  }
+
+  .search-form > div {
+    display: flex;
+  }
+
+  input {
+    width: 100%;
+    min-height: 58px;
+    padding: .8rem 1rem;
+    border: 1px solid var(--ink);
+    border-right: 0;
+    background: var(--paper);
+    font-family: var(--serif);
+    font-size: 1.1rem;
+  }
+
+  button {
+    min-width: 110px;
+    border: 1px solid var(--ink);
+    color: var(--paper);
+    background: var(--ink);
+    font: 700 .75rem/1 var(--mono);
+    cursor: pointer;
+  }
+
+  #search-status {
+    margin: 1.5rem 0;
+    font: .72rem/1 var(--mono);
+  }
+
+  #search-results {
+    display: grid;
+    max-width: 950px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #search-results li {
+    border-top: 1px solid var(--line);
+  }
+
+  #search-results a {
+    display: grid;
+    padding: 1.2rem 0;
+    gap: .35rem;
+    text-decoration: none;
+  }
+
+  #search-results strong {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+  }
+
+  #search-results span {
+    color: var(--muted);
+    font-size: .9rem;
+  }
+
+  #search-results :global(mark) {
+    color: inherit;
+    background: rgba(201,66,44,.2);
+  }
+
+  @media (max-width: 800px) {
+    header {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .search-form > div {
+      display: grid;
+    }
+
+    input {
+      border-right: 1px solid var(--ink);
+    }
+
+    button {
+      min-height: 48px;
+    }
+  }
+</style>

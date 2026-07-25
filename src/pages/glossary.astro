@@ -1,0 +1,100 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const terms = [
+  ["Agent", "能读取上下文、调用工具并循环执行任务的 AI 系统，不只是一次问答。"],
+  ["Agentic Coding", "由 Agent 主动检查代码、修改文件、运行命令和测试的软件协作方式。"],
+  ["API Key", "调用模型服务的凭证，等同密码处理，不写入代码库。"],
+  ["Base URL", "企业模型网关的请求入口，通常以 /v1 结尾。"],
+  ["Context", "模型这一次能看到的目标、文件、规则、对话和工具结果。"],
+  ["Context Engineering", "有意识地组织上下文，使 Agent 在正确约束下完成任务。"],
+  ["Diff", "修改前后文件内容的差异，是人工审查 Agent 工作的核心证据。"],
+  ["MCP", "Model Context Protocol，用统一方式把 Agent 连接到外部工具与数据。"],
+  ["OpenAI-compatible API", "遵循 OpenAI 常用请求格式的模型接口，可由不同模型和推理平台实现。"],
+  ["Prompt Injection", "藏在网页、文件或消息中的恶意指令，试图诱导 Agent 执行非预期操作。"],
+  ["Skill", "由说明、资源和脚本组成的可复用能力包，通常以 SKILL.md 为入口。"],
+  ["Vibe Coding", "通过自然语言表达意图、观察结果并继续调整的快速软件创作方式。"],
+  ["Worktree", "同一 Git 仓库的隔离工作目录，适合多个 Agent 并行工作。"],
+  ["验收标准", "判断任务是否完成的可观察条件，比“做得好看一点”更可验证。"]
+];
+---
+
+<BaseLayout title="术语表" description="Vibe Coding、Agent、Skill、MCP 等核心术语的中文解释。">
+  <section class="glossary site-shell">
+    <header>
+      <p class="eyebrow">Glossary</p>
+      <h1>不背黑话。<br />只理解它们。</h1>
+      <p>本页给出这本教程中的工作定义。工具名称变化很快，概念之间的关系更值得记住。</p>
+    </header>
+    <dl>
+      {terms.map(([term, definition], index) => (
+        <div>
+          <dt><span>{String(index + 1).padStart(2, "0")}</span>{term}</dt>
+          <dd>{definition}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+</BaseLayout>
+
+<style>
+  .glossary {
+    padding-block: 5rem;
+  }
+
+  header {
+    display: grid;
+    grid-template-columns: .7fr 2fr 1fr;
+    align-items: end;
+    gap: 3rem;
+    margin-bottom: 4rem;
+  }
+
+  h1 {
+    margin: 0;
+    font: 760 clamp(3.2rem, 7vw, 7rem)/.98 var(--serif);
+    letter-spacing: -.055em;
+  }
+
+  header > p:last-child {
+    color: var(--muted);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0;
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--ink);
+  }
+
+  dl div {
+    min-height: 190px;
+    padding: 1.5rem;
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  dt {
+    font: 720 1.4rem/1.2 var(--serif);
+  }
+
+  dt span {
+    margin-right: .8rem;
+    color: var(--red);
+    font: .65rem/1 var(--mono);
+  }
+
+  dd {
+    margin: 1rem 0 0;
+    color: var(--muted);
+    font-size: .9rem;
+  }
+
+  @media (max-width: 760px) {
+    header,
+    dl {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

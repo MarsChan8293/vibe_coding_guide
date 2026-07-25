@@ -1,0 +1,120 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const groups = [
+  {
+    title: "OpenCode",
+    links: [
+      ["官方文档", "https://opencode.ai/docs/"],
+      ["自定义 Provider", "https://opencode.ai/docs/providers/"],
+      ["配置文件", "https://opencode.ai/docs/config/"],
+      ["GitHub 仓库", "https://github.com/anomalyco/opencode"]
+    ]
+  },
+  {
+    title: "构建与发布",
+    links: [
+      ["Astro 文档", "https://docs.astro.build/"],
+      ["Astro 部署到 GitHub Pages", "https://docs.astro.build/en/guides/deploy/github/"],
+      ["GitHub Pages 文档", "https://docs.github.com/en/pages"],
+      ["Pagefind 文档", "https://pagefind.app/docs/"]
+    ]
+  },
+  {
+    title: "概念来源",
+    links: [
+      ["Claude Code 发布", "https://www.anthropic.com/news/claude-3-7-sonnet"],
+      ["Agent Skills", "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills"],
+      ["Codex App", "https://openai.com/index/introducing-the-codex-app/"],
+      ["OpenClaw", "https://github.com/openclaw/openclaw"]
+    ]
+  }
+];
+---
+
+<BaseLayout title="资料索引" description="教程使用的官方文档和进一步阅读资料。">
+  <section class="resources site-shell">
+    <header>
+      <p class="eyebrow">Sources</p>
+      <h1>先看官方，<br />再听经验。</h1>
+      <p>工具会更新，命令会变化。遇到版本差异时，以这里链接的官方文档为准。</p>
+    </header>
+    <div class="resource-grid">
+      {groups.map((group, index) => (
+        <section>
+          <span>{String(index + 1).padStart(2, "0")}</span>
+          <h2>{group.title}</h2>
+          <ul>
+            {group.links.map(([label, href]) => (
+              <li><a href={href} target="_blank" rel="noreferrer">{label} ↗</a></li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .resources {
+    padding-block: 5rem;
+  }
+
+  header {
+    display: grid;
+    grid-template-columns: .7fr 2fr 1fr;
+    align-items: end;
+    gap: 3rem;
+    margin-bottom: 4rem;
+  }
+
+  h1 {
+    margin: 0;
+    font: 760 clamp(3.2rem, 7vw, 7rem)/.98 var(--serif);
+    letter-spacing: -.055em;
+  }
+
+  header > p:last-child {
+    color: var(--muted);
+  }
+
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--ink);
+  }
+
+  .resource-grid section {
+    min-height: 360px;
+    padding: 1.5rem;
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .resource-grid span {
+    color: var(--red);
+    font: 700 .68rem/1 var(--mono);
+  }
+
+  .resource-grid h2 {
+    margin: 1rem 0 3rem;
+    font: 720 2.2rem/1 var(--serif);
+  }
+
+  .resource-grid ul {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    gap: .8rem;
+    list-style: none;
+    font: .78rem/1.4 var(--mono);
+  }
+
+  @media (max-width: 760px) {
+    header,
+    .resource-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

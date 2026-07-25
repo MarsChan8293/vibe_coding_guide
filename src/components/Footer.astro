@@ -1,0 +1,75 @@
+---
+import { BASE } from "../lib/site";
+---
+
+<footer class="site-footer">
+  <div class="site-shell footer-grid">
+    <div>
+      <p class="footer-title">Vibe Coding<br />从感觉到工程</p>
+      <p class="footer-note">写给在企业 Linux 环境里第一次与 Coding Agent 协作的人。</p>
+    </div>
+    <div class="footer-index">
+      <span>索引</span>
+      <a href={`${BASE}start/`}>从这里开始</a>
+      <a href={`${BASE}glossary/`}>术语表</a>
+      <a href={`${BASE}resources/`}>资料索引</a>
+    </div>
+    <div class="footer-meta">
+      <span>开源教程 · GitHub Pages</span>
+      <a href="https://github.com/MarsChan8293/vibe_coding_guide">查看源码 ↗</a>
+      <span>把速度留给 Agent，把责任留给人。</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 8rem;
+    padding: 3.5rem 0;
+    border-top: 1px solid var(--ink);
+    color: var(--paper);
+    background: var(--ink);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 4rem;
+  }
+
+  .footer-title {
+    margin: 0;
+    font: 700 clamp(1.8rem, 4vw, 3.8rem)/1.05 var(--serif);
+  }
+
+  .footer-note {
+    max-width: 30rem;
+    color: #bdb9ad;
+  }
+
+  .footer-index,
+  .footer-meta {
+    display: grid;
+    align-content: start;
+    gap: .75rem;
+    font: .76rem/1.5 var(--mono);
+  }
+
+  .footer-index > span,
+  .footer-meta > span:first-child {
+    color: #8c8b80;
+    text-transform: uppercase;
+  }
+
+  .footer-index a,
+  .footer-meta a {
+    color: var(--paper);
+  }
+
+  @media (max-width: 760px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+  }
+</style>

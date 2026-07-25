@@ -1,0 +1,105 @@
+---
+title: "05｜完成第一次安全会话"
+description: "让 OpenCode 先观察、再计划、最后做一个可验证的小修改，建立正确的协作节奏。"
+section: practice
+order: 5
+estimatedMinutes: 18
+prerequisites: ["企业 Provider 连接成功", "练习仓库工作区干净"]
+outcomes:
+  - "把目标、范围和验收标准写进任务"
+  - "先使用只读探索，再授权修改"
+  - "用 Git Diff 与命令结果验证交付"
+tags: ["首次会话", "安全", "Git Diff"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["OpenCode 官方入门文档"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+第一次会话不做完整网站。我们只让 Agent 改进 README，并观察从指令到证据的整个过程。
+
+## 第一步：只读探索
+
+在仓库中启动 OpenCode：
+
+```bash
+cd "$HOME/workspace/vibe-portfolio"
+opencode
+```
+
+输入：
+
+```text
+先不要修改文件。
+请检查当前仓库结构和 Git 状态，然后说明：
+1. 这个项目现在有什么；
+2. 下一步最小、可验证的改进是什么；
+3. 你准备读取和修改哪些文件。
+```
+
+好的回复应该承认仓库几乎为空，并把范围限制在 README。若它声称看到了不存在的文件，先指出事实，不要继续授权。
+
+## 第二步：给出完整任务
+
+```text
+目标：把 README 改成个人作品集项目说明。
+范围：只允许修改 README.md，不创建其他文件，不安装依赖。
+内容：项目目标、计划页面、技术约束、完成定义。
+验收：
+1. Markdown 结构清晰；
+2. 不包含真实姓名、密钥或内部地址；
+3. 修改后展示 git diff；
+4. 不执行 git commit。
+请先给出 3 步计划，等我确认后再修改。
+```
+
+先阅读计划。只有计划符合范围，才回复“按计划执行”。
+
+## 第三步：自己查看证据
+
+退出或另开终端：
+
+```bash
+git status
+git diff -- README.md
+```
+
+逐行检查：
+
+- 只修改了 README；
+- 内容符合目标；
+- 没有虚构已经完成的网站功能；
+- 没有敏感信息。
+
+如果不满意，不要只说“再好一点”。指出具体差异，例如“完成定义必须写成可勾选的四项，并删除没有证据的完成描述”。
+
+## 第四步：接受并提交
+
+确认内容后：
+
+```bash
+git add README.md
+git commit -m "Define portfolio project"
+git status
+```
+
+<Callout type="checkpoint" title="你刚完成了完整闭环">
+  观察事实 → 写清任务 → 审查计划 → 授权修改 → 查看 Diff → 人工提交。后面的项目会更复杂，但循环不变。
+</Callout>
+
+## 如果 Agent 越界
+
+先停止当前动作，再用 `git status` 和 `git diff` 确认影响。不要立刻运行 Agent 建议的清理命令。如果只有未提交文件修改，可以逐个决定保留或恢复；涉及安装、网络或系统文件时，记录命令并联系管理员。
+
+<Checklist
+  id="practice-first-session"
+  items={[
+    "Agent 在修改前先完成了只读探索",
+    "任务包含目标、范围和验收标准",
+    "计划得到人工确认后才执行",
+    "git diff 只包含 README.md",
+    "我本人确认内容后才创建 Git 提交"
+  ]}
+/>

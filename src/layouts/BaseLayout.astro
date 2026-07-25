@@ -1,0 +1,122 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { BASE, SITE_DESCRIPTION, SITE_TITLE } from "../lib/site";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  pagefind?: boolean;
+}
+
+const {
+  title = SITE_TITLE,
+  description = SITE_DESCRIPTION,
+  pagefind = true
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f1eadb" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={`${BASE}favicon.svg`} type="image/svg+xml" />
+    <title>{title === SITE_TITLE ? title : `${title}｜${SITE_TITLE}`}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到正文</a>
+    <Header />
+    <main id="main" data-pagefind-body={pagefind ? "" : undefined}>
+      <slot />
+    </main>
+    <Footer />
+
+    <script is:inline define:vars={{ base: BASE }}>
+      const STORAGE_KEY = "vibe-guide:progress:v1";
+      const readProgress = () => {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"lessons":{},"steps":{}}');
+        } catch {
+          return { lessons: {}, steps: {} };
+        }
+      };
+      const writeProgress = (state) => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        window.dispatchEvent(new CustomEvent("vibe-progress"));
+      };
+      const syncProgress = () => {
+        const state = readProgress();
+        const completed = Object.values(state.lessons || {}).filter(Boolean).length;
+        document.querySelectorAll("[data-progress-count]").forEach((node) => {
+          node.textContent = `${completed}/24`;
+        });
+        document.querySelectorAll("[data-progress-bar]").forEach((node) => {
+          node.style.setProperty("--progress", `${(completed / 24) * 100}%`);
+          node.setAttribute("aria-valuenow", String(completed));
+        });
+        document.querySelectorAll("[data-lesson-toggle]").forEach((button) => {
+          const id = button.dataset.lessonToggle;
+          const active = Boolean(state.lessons?.[id]);
+          button.setAttribute("aria-pressed", String(active));
+          const label = button.querySelector("[data-label]");
+          if (label) label.textContent = active ? "本课已完成" : "标记本课已完成";
+        });
+        document.querySelectorAll("[data-step-id]").forEach((input) => {
+          input.checked = Boolean(state.steps?.[input.dataset.stepId]);
+        });
+      };
+
+      document.addEventListener("click", async (event) => {
+        const lessonButton = event.target.closest("[data-lesson-toggle]");
+        if (lessonButton) {
+          const state = readProgress();
+          const id = lessonButton.dataset.lessonToggle;
+          state.lessons ||= {};
+          state.lessons[id] = !state.lessons[id];
+          writeProgress(state);
+        }
+
+        const resetButton = event.target.closest("[data-progress-reset]");
+        if (resetButton && window.confirm("确定清除这台浏览器中的全部学习进度吗？")) {
+          localStorage.removeItem(STORAGE_KEY);
+          syncProgress();
+        }
+
+        const copyButton = event.target.closest(".copy-code");
+        if (copyButton) {
+          const code = copyButton.parentElement?.querySelector("code")?.textContent || "";
+          await navigator.clipboard.writeText(code);
+          copyButton.textContent = "已复制";
+          setTimeout(() => (copyButton.textContent = "复制"), 1400);
+        }
+      });
+
+      document.addEventListener("change", (event) => {
+        if (!event.target.matches("[data-step-id]")) return;
+        const state = readProgress();
+        state.steps ||= {};
+        state.steps[event.target.dataset.stepId] = event.target.checked;
+        writeProgress(state);
+      });
+
+      document.querySelectorAll("pre").forEach((pre) => {
+        if (pre.querySelector(".copy-code")) return;
+        const button = document.createElement("button");
+        button.className = "copy-code";
+        button.type = "button";
+        button.textContent = "复制";
+        button.setAttribute("aria-label", "复制代码");
+        pre.append(button);
+      });
+
+      window.addEventListener("vibe-progress", syncProgress);
+      syncProgress();
+    </script>
+  </body>
+</html>

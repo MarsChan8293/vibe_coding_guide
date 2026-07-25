@@ -1,0 +1,102 @@
+---
+title: "02｜准备 Git 与 Node.js"
+description: "安装或验证项目所需的基础工具，并用一个最小 Git 仓库建立可回退的工作起点。"
+section: practice
+order: 2
+estimatedMinutes: 16
+prerequisites: ["已完成 Linux 环境检查", "知道软件安装权限"]
+outcomes:
+  - "验证 Git、Node.js 与 npm 可用"
+  - "配置最小 Git 身份"
+  - "创建第一个可回退的仓库基线"
+tags: ["Git", "Node.js", "npm"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["Git 官方文档", "Node.js LTS"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+Git 负责记录变化和回退；Node.js 与 npm 负责运行网页项目和安装开发依赖。Agent 可以帮你调用它们，但你至少要能判断命令是否成功。
+
+## 安装缺少的工具
+
+Ubuntu：
+
+```bash
+sudo apt update
+sudo apt install -y git curl
+```
+
+openEuler：
+
+```bash
+sudo dnf install -y git curl
+```
+
+Node.js 建议使用企业批准的当前 LTS 版本。若系统仓库版本过旧，不要自行添加来历不明的软件源；优先使用管理员提供的模块、内部镜像或 Node 官方安装方式。
+
+## 验证版本
+
+```bash
+git --version
+node --version
+npm --version
+```
+
+本实践要求 Node.js 22 或企业批准的更新 LTS。看到 `command not found` 时回到安装步骤；看到权限错误时联系管理员。
+
+## 配置 Git 身份
+
+```bash
+git config --global user.name "你的姓名"
+git config --global user.email "你的 GitHub 邮箱"
+git config --global init.defaultBranch main
+```
+
+检查配置：
+
+```bash
+git config --global --list
+```
+
+<Callout type="note" title="邮箱隐私">
+  公开仓库可以使用 GitHub 提供的 noreply 邮箱。不要为了跟教程一致而公开企业内部邮箱。
+</Callout>
+
+## 创建最小仓库
+
+```bash
+cd "$HOME/workspace"
+mkdir vibe-portfolio
+cd vibe-portfolio
+git init
+printf '# 我的作品集\n' > README.md
+git add README.md
+git commit -m "Initialize portfolio project"
+git status
+```
+
+最后应该看到工作区干净。这个提交是你的第一个安全锚点：后续 Agent 修改异常时，可以查看差异或回到这里。
+
+## 先记住三个 Git 命令
+
+```bash
+git status
+git diff
+git log --oneline --decorate -5
+```
+
+它们分别回答：现在有什么变化、具体改了什么、最近有哪些回退点。
+
+<Checklist
+  id="practice-git-node"
+  items={[
+    "Git、Node.js 与 npm 都能输出版本",
+    "Git 姓名和邮箱配置正确",
+    "vibe-portfolio 仓库已创建",
+    "README 的初始提交成功",
+    "git status 显示工作区干净"
+  ]}
+/>

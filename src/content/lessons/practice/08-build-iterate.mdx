@@ -1,0 +1,96 @@
+---
+title: "08｜小步生成，逐轮看结果"
+description: "初始化 Astro 作品集，按结构、内容、视觉三轮迭代，每轮都构建、审查并留下回退点。"
+section: practice
+order: 8
+estimatedMinutes: 35
+prerequisites: ["PLAN.md 与 AGENTS.md 已提交", "Node.js 与 npm 可用"]
+outcomes:
+  - "完成可构建的 Astro 作品集"
+  - "把结构、内容和视觉分轮实现"
+  - "在每轮后用 Git 保存安全锚点"
+tags: ["Astro", "实现", "迭代"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["Astro 官方入门文档"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+现在开始写代码，但仍然不把全部任务一次性交给 Agent。
+
+## 第 0 轮：初始化并证明能构建
+
+在仓库根目录执行：
+
+```bash
+npm create astro@latest . -- --template minimal --install --no-git --yes
+npm run build
+git status
+```
+
+如果脚手架提示目录非空，让 OpenCode先分析冲突，不要用强制覆盖。必须保留 README、BRIEF、CONTENT、PLAN 和 AGENTS。
+
+构建成功后提交：
+
+```bash
+git add .
+git commit -m "Scaffold Astro portfolio"
+```
+
+## 第 1 轮：只做语义结构
+
+给 OpenCode：
+
+```text
+执行 PLAN.md 的“页面结构”步骤。
+只建立首页语义结构和必要组件，使用 CONTENT.md 的真实文字。
+暂时不要做复杂视觉、动画或新增依赖。
+完成后运行 npm run build，并汇报文件列表与结果。
+```
+
+打开生成的 HTML 或开发服务器，确认标题、项目、能力和联系方式都存在。此时页面不好看没有关系。
+
+## 第 2 轮：建立设计系统
+
+```text
+执行“视觉系统”步骤。
+根据 BRIEF.md 建立 CSS 变量：纸张底色、正文墨色、单一朱红强调色、间距和字体层级。
+避免紫色渐变、玻璃卡片和通用三卡布局。
+保持 HTML 语义不变，完成后构建。
+```
+
+审查 Agent 是否为了视觉引入外部字体 CDN。如果有，改为本地字体或系统字体栈。
+
+## 第 3 轮：精修真实内容
+
+```text
+执行“内容呈现”步骤。
+重点处理项目叙事层级、长文本可读性和链接状态。
+不得添加 CONTENT.md 中不存在的经历、数字或客户。
+修改后运行构建，并列出仍需人工确认的内容。
+```
+
+<Callout type="checkpoint" title="每轮都留下锚点">
+  每轮完成后先 `git diff`、构建和浏览，再提交。不要等到几十个文件一起变化时才第一次审查。
+</Callout>
+
+## 开发预览
+
+```bash
+npm run dev -- --host 127.0.0.1
+```
+
+终端会显示本地地址。浏览器预览期间保留终端输出；出现错误时先读第一条明确错误，而不是把整屏日志反复丢给 Agent。
+
+<Checklist
+  id="practice-build"
+  items={[
+    "Astro 初始化后 npm run build 成功",
+    "语义结构、视觉系统、内容呈现分三轮完成",
+    "页面只使用 CONTENT.md 的真实信息",
+    "没有加入外部运行时 CDN",
+    "每轮都经过 Diff、构建、浏览和 Git 提交"
+  ]}
+/>

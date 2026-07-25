@@ -1,0 +1,101 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { BASE } from "../lib/site";
+---
+
+<BaseLayout title="从这里开始" description="开始 Vibe Coding 教程前的环境、账号和学习方式说明。">
+  <article class="support-page site-shell">
+    <header>
+      <p class="eyebrow">Start here</p>
+      <h1>先别急着<br />打开 Agent。</h1>
+      <p>十分钟确认环境与边界，能省掉后面数小时的排错。你不需要编程经验，但需要知道自己正在授权什么。</p>
+    </header>
+    <div class="support-grid">
+      <aside>
+        <span>准备时间</span>
+        <strong>10–20 分钟</strong>
+        <span>主线环境</span>
+        <strong>Ubuntu / bash</strong>
+        <span>实践结果</span>
+        <strong>个人作品集网站</strong>
+      </aside>
+      <div class="prose">
+        <h2>你需要准备</h2>
+        <ul>
+          <li>一台可以使用终端的 Linux 电脑；正文以 Ubuntu 为主，并提供 openEuler 差异提示。</li>
+          <li>企业管理员提供的模型 Base URL、模型 ID 和 API Key。不要把真实值发到聊天、截图或 Git 仓库。</li>
+          <li>一个 GitHub 账号。实践最后会创建公开仓库并部署到 GitHub Pages。</li>
+          <li>允许安装 Git、Node.js、npm 和 OpenCode 的权限；没有权限时先联系管理员。</li>
+        </ul>
+        <h2>推荐阅读顺序</h2>
+        <ol>
+          <li>用历史时间轴快速建立概念坐标。</li>
+          <li>阅读工具地图与 OpenCode 两篇，先知道自己在用什么。</li>
+          <li>连续完成 11 篇实践，不要跳过测试和部署。</li>
+          <li>最后读方法总结，把一次成功变成可重复的工作方式。</li>
+        </ol>
+        <h2>这本教程不会替你做什么</h2>
+        <p>不会替你决定业务目标，不会保证模型生成的代码正确，也不会要求你盲目接受修改。每个重要步骤都会要求你观察文件、运行检查或保留回退点。</p>
+        <p><a class="button" href={`${BASE}history/`}>开始第一章 →</a></p>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .support-page {
+    padding-block: 5rem;
+  }
+
+  header {
+    display: grid;
+    grid-template-columns: .7fr 2fr 1fr;
+    align-items: end;
+    gap: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  h1 {
+    margin: 0;
+    font: 760 clamp(3.2rem, 7vw, 7rem)/.98 var(--serif);
+    letter-spacing: -.055em;
+  }
+
+  header > p:last-child {
+    color: var(--muted);
+  }
+
+  .support-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 5rem;
+    padding-top: 4rem;
+  }
+
+  aside {
+    display: grid;
+    align-content: start;
+    gap: .45rem;
+  }
+
+  aside span {
+    margin-top: 1rem;
+    color: var(--muted);
+    font: .65rem/1 var(--mono);
+  }
+
+  aside strong {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--serif);
+  }
+
+  @media (max-width: 780px) {
+    header,
+    .support-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+</style>

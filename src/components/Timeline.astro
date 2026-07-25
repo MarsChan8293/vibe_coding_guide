@@ -1,0 +1,265 @@
+---
+interface Source {
+  label: string;
+  href: string;
+}
+
+interface Event {
+  date: string;
+  title: string;
+  concept: string;
+  summary: string;
+  impact: string;
+  question: string;
+  sources: Source[];
+}
+
+interface Props {
+  events: Event[];
+}
+
+const { events } = Astro.props;
+---
+
+<ol class="timeline" aria-label="2025 年至今的 Vibe Coding 时间轴">
+  {events.map((event, index) => (
+    <li>
+      <details open={index === 1 || index === events.length - 1}>
+        <summary>
+          <span class="event-index">{String(index + 1).padStart(2, "0")}</span>
+          <span class="event-date">{event.date}</span>
+          <strong>{event.title}</strong>
+          <span class="event-concept">{event.concept}</span>
+        </summary>
+        <div class="event-body">
+          <p>{event.summary}</p>
+          <dl>
+            <div>
+              <dt>为什么重要</dt>
+              <dd>{event.impact}</dd>
+            </div>
+            <div>
+              <dt>留下的问题</dt>
+              <dd>{event.question}</dd>
+            </div>
+          </dl>
+          <p class="event-sources">
+            {event.sources.map((source) => (
+              <a href={source.href} target="_blank" rel="noreferrer">{source.label} ↗</a>
+            ))}
+          </p>
+        </div>
+      </details>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .timeline {
+    display: grid;
+    margin: 3rem 0;
+    padding: 0;
+    gap: 0;
+    list-style: none;
+  }
+
+  .timeline li {
+    position: relative;
+    padding-left: 3rem;
+  }
+
+  .timeline li::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: .65rem;
+    width: 2px;
+    content: "";
+    background: var(--ink);
+  }
+
+  .timeline li::after {
+    position: absolute;
+    top: 1.55rem;
+    left: .25rem;
+    width: .85rem;
+    height: .85rem;
+    border: 2px solid var(--paper);
+    border-radius: 50%;
+    content: "";
+    background: var(--red);
+    box-shadow: 0 0 0 1px var(--red);
+  }
+
+  details {
+    margin-bottom: 1.2rem;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.23);
+  }
+
+  summary {
+    display: grid;
+    grid-template-columns: 2.6rem 8rem 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    grid-column: 4;
+    grid-row: 1;
+    content: "+";
+    font: 500 1.5rem/1 var(--mono);
+  }
+
+  details[open] summary::after {
+    content: "−";
+  }
+
+  .event-index,
+  .event-date,
+  .event-concept {
+    font-family: var(--mono);
+  }
+
+  .event-index {
+    color: var(--red);
+    font-size: .72rem;
+  }
+
+  .event-date {
+    font-size: .72rem;
+  }
+
+  summary strong {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+  }
+
+  .event-concept {
+    grid-column: 3;
+    margin-top: -.5rem;
+    color: var(--muted);
+    font-size: .68rem;
+  }
+
+  .event-body {
+    padding: 0 1.25rem 1.4rem 12.6rem;
+    border-top: 1px solid var(--soft-line);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  dt {
+    color: var(--red-dark);
+    font: 700 .65rem/1 var(--mono);
+    letter-spacing: .08em;
+  }
+
+  dd {
+    margin: .45rem 0 0;
+  }
+
+  .event-sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font: 650 .7rem/1.4 var(--mono);
+  }
+
+  @media (min-width: 1040px) {
+    .timeline {
+      width: calc(100vw - 7rem);
+      max-width: 1280px;
+      grid-template-columns: repeat(4, minmax(235px, 1fr));
+      gap: 1rem;
+      transform: translateX(-7rem);
+    }
+
+    .timeline li {
+      padding: 2.3rem 0 0;
+    }
+
+    .timeline li::before {
+      top: .7rem;
+      right: -1rem;
+      bottom: auto;
+      left: 0;
+      width: auto;
+      height: 2px;
+    }
+
+    .timeline li::after {
+      top: .25rem;
+      left: 0;
+    }
+
+    summary {
+      min-height: 190px;
+      grid-template-columns: 1fr auto;
+      align-content: start;
+    }
+
+    .event-date,
+    summary strong,
+    .event-concept {
+      grid-column: 1 / -1;
+    }
+
+    summary strong {
+      margin-top: .5rem;
+      font-size: 1.35rem;
+    }
+
+    .event-concept {
+      margin-top: .1rem;
+    }
+
+    .event-body {
+      padding: 1rem;
+    }
+
+    dl {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .timeline li {
+      padding-left: 2rem;
+    }
+
+    summary {
+      grid-template-columns: 2rem 1fr auto;
+      gap: .55rem;
+    }
+
+    .event-date,
+    summary strong,
+    .event-concept {
+      grid-column: 2 / 4;
+    }
+
+    summary strong {
+      font-size: 1rem;
+    }
+
+    .event-body {
+      padding: 0 1rem 1rem;
+    }
+
+    dl {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

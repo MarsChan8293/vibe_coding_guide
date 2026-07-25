@@ -1,0 +1,152 @@
+---
+title: "从 Vibe Coding 到 Agentic Engineering"
+description: "从 2025 年开始，用八个事件看懂 AI 编程如何从“生成代码”走向可复用、可监督、长期运行的 Agent。"
+section: history
+order: 1
+estimatedMinutes: 14
+prerequisites: []
+outcomes:
+  - "说清 Vibe Coding、Coding Agent、Skills 与 Agentic Engineering 的关系"
+  - "把产品热度与真正的工作方式变化区分开"
+  - "理解为什么能力越强，验证和权限边界越重要"
+tags: ["时间轴", "概念演进", "2025–2026"]
+reviewedAt: "2026-07-25"
+reviewedAgainst:
+  - "DeepSeek 官方发布"
+  - "Anthropic Claude Code 与 Agent Skills 官方发布"
+  - "OpenAI Codex 官方发布"
+  - "OpenClaw 官方仓库"
+draft: false
+---
+
+import Timeline from "../../../components/Timeline.astro";
+import Callout from "../../../components/Callout.astro";
+
+export const events = [
+  {
+    date: "2025 · JAN",
+    title: "DeepSeek-R1 与开放推理模型",
+    concept: "推理模型 / 开放权重 / 本地部署",
+    summary: "DeepSeek-R1 的发布让更多团队看到：强推理能力不必只存在于一个封闭应用里。模型权重、API 服务与上层工具可以被拆开选择，企业也可以在自己的基础设施中提供兼容接口。",
+    impact: "Coding Agent 开始更像一个可替换模型的工作台。你可以保留同一套 OpenCode 工作方式，同时由管理员切换后端模型。",
+    question: "开放或本地部署不自动等于安全。模型能力、服务权限、日志留存和数据边界仍需要分别评估。",
+    sources: [
+      { label: "DeepSeek 官方发布", href: "https://api-docs.deepseek.com/news/news250120/" }
+    ]
+  },
+  {
+    date: "2025 · FEB 02",
+    title: "Vibe Coding 被命名",
+    concept: "自然语言编程 / Accept All / 快速原型",
+    summary: "Andrej Karpathy 用“Vibe Coding”描述一种新体验：说出想法，运行 AI 写出的代码，看到问题后继续用语言调整。这个词捕捉到的不是新语法，而是人与代码关系的变化。",
+    impact: "产品、设计和运营人员第一次能直接做出可运行的软件原型。表达意图的能力，开始比记忆 API 更早产生价值。",
+    question: "原始描述带有“忘掉代码”的轻松意味，适合探索性项目；当软件进入生产，谁来理解风险并对结果负责？",
+    sources: [
+      { label: "Collins 2025 年度词", href: "https://www.collinsdictionary.com/de/woty" }
+    ]
+  },
+  {
+    date: "2025 · FEB 24",
+    title: "Claude Code 引爆终端 Agent",
+    concept: "Agentic Coding / 工具调用 / 自动测试",
+    summary: "Claude Code 的研究预览把 Agent 放进终端：它能搜索仓库、编辑文件、执行命令、运行测试。工作的基本单位不再是一个函数或代码片段，而是一个带有验收条件的工程任务。",
+    impact: "终端成为 Agent 的通用接口。后续 OpenCode、Codex CLI、Gemini CLI 等工具都强化了“读—改—跑—查”的循环。",
+    question: "能执行命令意味着能造成真实影响。审批、沙箱、版本控制和最小权限开始成为日常使用的一部分。",
+    sources: [
+      { label: "Anthropic 官方发布", href: "https://www.anthropic.com/news/claude-3-7-sonnet" }
+    ]
+  },
+  {
+    date: "2025 · MAR",
+    title: "Manus 带火通用 AI Agent",
+    concept: "General Agent / 虚拟电脑 / 任务交付",
+    summary: "Manus 的传播让公众看到另一种 Agent：不是只回答问题，而是在独立环境中浏览网页、整理资料、生成文件并交付结果。Coding Agent 与通用 Agent 的边界开始变薄。",
+    impact: "人们开始按“最终交付物”而不是“回答得像不像人”评价 AI。软件开发也被放进更长的研究、设计和发布链路里。",
+    question: "长链路任务会累积错误。过程不可见、来源不清楚或无法回滚时，一个漂亮结果并不足以证明任务完成。",
+    sources: [
+      { label: "Manus 官方回顾", href: "https://manus.im/blog/what-we-saw-in-the-past-three-months-and-what-we-see-in-the-future" }
+    ]
+  },
+  {
+    date: "2025 · APR–JUN",
+    title: "Coding Agent 集体爆发",
+    concept: "CLI / 云端沙箱 / PR Agent",
+    summary: "Codex CLI 与云端 Codex、GitHub Copilot Coding Agent、Gemini CLI、OpenCode 等相继受到关注。产品形态逐渐稳定为三类：本地终端协作、云端并行任务、Issue 到 Pull Request 的后台代理。",
+    impact: "Agent 不再绑定某一个编辑器或模型。团队开始组合本地反馈速度、云端隔离执行和 GitHub 审查流程。",
+    question: "产品名称越来越多，但选型不能只看榜单。数据是否出网、能否使用企业模型、如何审查变更更值得优先比较。",
+    sources: [
+      { label: "Codex", href: "https://openai.com/index/introducing-codex/" },
+      { label: "Copilot Coding Agent", href: "https://github.blog/news-insights/product-news/github-copilot-meet-the-new-coding-agent/" },
+      { label: "Gemini CLI", href: "https://blog.google/innovation-and-ai/technology/developers-tools/introducing-gemini-cli-open-source-ai-agent/" }
+    ]
+  },
+  {
+    date: "2025 · OCT–DEC",
+    title: "Agent Skills 成为新热词",
+    concept: "SKILL.md / 渐进加载 / 开放标准",
+    summary: "Agent Skills 把说明、参考资料与脚本放进一个可发现的目录。Agent 先看到名称和描述，真正需要时才读取完整内容。12 月，Skills 进一步成为跨产品的开放标准。",
+    impact: "关注点从“写一句万能 Prompt”转向“把团队经验变成可测试、可版本化、可共享的能力”。工作方法开始像代码一样被维护。",
+    question: "Skill 可能包含脚本和外部依赖。安装社区 Skill 前，必须检查它会读取什么、运行什么、连接哪里。",
+    sources: [
+      { label: "Agent Skills 官方介绍", href: "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills" }
+    ]
+  },
+  {
+    date: "2026 · JAN–FEB",
+    title: "OpenClaw 与长期运行 Agent",
+    concept: "常驻 Agent / 持久记忆 / 消息渠道",
+    summary: "OpenClaw 从 Clawdbot、Moltbot 更名后迅速传播。它通过消息应用接受任务，连接浏览器、文件、邮件和日历，并能持续运行。Agent 从一次 coding session 扩展成了个人计算环境的一部分。",
+    impact: "Skills、记忆、定时任务和多渠道连接组合到一起，展示了“自己的 Agent”可以是什么样子。",
+    question: "常驻 Agent 拥有更长时间和更大权限，也更容易受到 Prompt Injection、凭证泄露和错误自动化影响。",
+    sources: [
+      { label: "OpenClaw 官方项目", href: "https://github.com/openclaw/openclaw" }
+    ]
+  },
+  {
+    date: "2026 · NOW",
+    title: "Multi-Agent 与 Agentic Engineering",
+    concept: "并行 Agent / Worktree / 自动化 / 监督",
+    summary: "Codex App 等产品开始让用户同时指挥多个 Agent，在隔离 worktree 中并行工作。讨论也从 Vibe Coding 走向 Agentic Engineering：不再只强调表达想法，而是强调任务拆解、约束、测试和审查。",
+    impact: "人的主要工作从逐行输入代码转向定义问题、设计接口、判断证据和承担最终责任。",
+    question: "并行并不会自动提高质量。没有清晰边界的多 Agent，只会更快地产生冲突、重复和不可审查的修改。",
+    sources: [
+      { label: "Codex App 官方发布", href: "https://openai.com/index/introducing-the-codex-app/" }
+    ]
+  }
+];
+
+2025 年之前，AI 编程已经经历了补全、聊天和编辑器集成。但这本手册从 2025 年开始，因为这一年发生了一个更重要的变化：**模型不再只给建议，它开始在真实的软件环境里采取行动。**
+
+这条时间轴不试图记录每次模型升级，也不拿关注度当作能力证明。我们只保留那些改变工作单位、协作接口或责任边界的节点。
+
+<Timeline events={events} />
+
+## 一条线索：工作单位不断变大
+
+代码补全时代，AI 的工作单位是一行代码；Vibe Coding 把它扩大为一个可见效果；Claude Code 等工具又把它扩大为一个工程任务；Skills 让一套完成任务的方法能够复用；OpenClaw 和多 Agent 产品则让任务跨越应用、设备和时间。
+
+工作单位越大，人越不可能通过“盯着每一个字符”控制质量。控制方式必须升级：
+
+1. 在开始前写清目标、限制和验收标准；
+2. 把大任务切成可以独立验证的小任务；
+3. 让 Agent 展示计划、差异、命令和测试结果；
+4. 给高风险动作设置审批与最小权限；
+5. 用 Git、测试和日志保留回退与追溯路径。
+
+<Callout type="warning" title="热度不是选型标准">
+  DeepSeek、Claude Code、Manus、Skills 和 OpenClaw 在不同时间引发大量讨论，但它们解决的问题并不相同。不要因为一个名字火热，就把它塞进所有工作流。先问：它改变的是模型、执行环境、知识复用，还是长期自动化？
+</Callout>
+
+## 从“忘掉代码”到“对结果负责”
+
+Vibe Coding 的价值是真实的：它让更多人能够直接把想法做成东西。它的风险也同样真实：自然语言看起来简单，却可能隐藏模糊需求；生成速度很快，却可能让审查和理解跟不上。
+
+因此，本教程不会把 Vibe Coding 与工程纪律放在对立面。我们保留它快速探索、即时反馈的优势，再加入计划、测试、版本控制和安全边界。你可以不亲手输入每一行代码，但必须能够回答：
+
+- 这次修改要解决什么问题？
+- Agent 改了哪些文件，为什么？
+- 什么证据表明它真的可用？
+- 出错时如何回到上一个安全状态？
+- 哪些信息和权限绝不能交给它？
+
+这就是从“感觉正确”走向 Agentic Engineering 的起点。

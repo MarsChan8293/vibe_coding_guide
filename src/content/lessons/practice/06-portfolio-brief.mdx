@@ -1,0 +1,115 @@
+---
+title: "06｜把作品集写成可执行需求"
+description: "在生成页面之前，先确定受众、内容、视觉方向和完成标准，让 Agent 不必替你猜产品决策。"
+section: practice
+order: 6
+estimatedMinutes: 20
+prerequisites: ["已完成第一次安全会话"]
+outcomes:
+  - "完成一页式作品集需求简报"
+  - "把主观视觉偏好转为可执行约束"
+  - "准备真实但不敏感的页面内容"
+tags: ["需求", "内容", "设计简报"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["Web 内容与设计基本实践"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+Agent 最容易生成的，是“一个有渐变背景、三张卡片和大按钮的现代网站”。这通常不是因为模型没有审美，而是因为需求没有提供任何值得记住的内容和约束。
+
+## 先回答六个问题
+
+在 `BRIEF.md` 中写下：
+
+```markdown
+# 个人作品集简报
+
+## 目标
+让招聘方在 90 秒内理解我擅长什么，并能查看两个代表项目。
+
+## 核心读者
+正在寻找初级产品设计 / 前端协作人才的团队负责人。
+
+## 页面内容
+- 一句话自我介绍
+- 两个项目：问题、我的工作、结果
+- 三项能力
+- 联系方式
+
+## 视觉方向
+像一本独立杂志：暖白纸张、黑色正文、一个红色强调色。
+避免紫色渐变、玻璃卡片、通用 SaaS 首页。
+
+## 技术约束
+Astro 静态站；无后端、无外部 CDN；移动端可用；部署到 GitHub Pages。
+
+## 完成定义
+- 所有内容均为真实信息；
+- 375px 与 1280px 可读；
+- 键盘能访问全部链接；
+- npm run build 成功；
+- GitHub Pages 可公开打开。
+```
+
+用你自己的目标和内容替换示例。暂时没有项目成果时，可以诚实写“练习项目”和学到什么，不要让 Agent 虚构客户、数据或职位。
+
+## 内容比布局更早
+
+准备 `CONTENT.md`：
+
+```markdown
+# 姓名或公开昵称
+一句话定位：
+
+## 项目一
+- 背景：
+- 问题：
+- 我做了什么：
+- 结果与证据：
+- 链接：
+
+## 项目二
+...
+
+## 联系方式
+- GitHub：
+- Email：
+```
+
+<Callout type="warning" title="公开网站的隐私边界">
+  不要写手机号、家庭地址、身份证明、客户内部数据、未公开项目或企业模型地址。邮箱可使用专门的公开联系邮箱。
+</Callout>
+
+## 让 Agent 只做审稿
+
+把简报与内容写完后，请 OpenCode：
+
+```text
+只读取 BRIEF.md 和 CONTENT.md，不修改文件。
+检查是否存在：
+1. 模糊且无法验证的要求；
+2. 页面需要但内容缺失的部分；
+3. 不适合公开发布的个人或企业信息。
+按风险高低列出问题，不要替我虚构答案。
+```
+
+自己补充答案，再提交：
+
+```bash
+git add BRIEF.md CONTENT.md
+git commit -m "Add portfolio brief and content"
+```
+
+<Checklist
+  id="practice-brief"
+  items={[
+    "BRIEF.md 写明目标、读者、内容、视觉、约束和完成定义",
+    "CONTENT.md 包含真实项目内容",
+    "没有客户机密、内部地址或过度个人信息",
+    "Agent 只审稿，没有替我编造答案",
+    "需求和内容已经提交到 Git"
+  ]}
+/>

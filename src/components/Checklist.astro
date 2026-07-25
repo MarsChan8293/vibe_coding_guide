@@ -1,0 +1,61 @@
+---
+interface Props {
+  id: string;
+  items: string[];
+  title?: string;
+}
+
+const { id, items, title = "完成检查" } = Astro.props;
+---
+
+<section class="checklist" data-checklist={id}>
+  <p class="checklist-title">{title}</p>
+  <div class="checklist-items">
+    {items.map((item, index) => (
+      <label>
+        <input type="checkbox" data-step-id={`${id}:${index + 1}`} />
+        <span>{item}</span>
+      </label>
+    ))}
+  </div>
+</section>
+
+<style>
+  .checklist {
+    margin: 2.4rem 0;
+    padding: 1.4rem;
+    border-top: 4px solid var(--olive);
+    background: rgba(90,105,70,.08);
+  }
+
+  .checklist-title {
+    margin: 0 0 1rem;
+    font: 750 .72rem/1 var(--mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .checklist-items {
+    display: grid;
+    gap: .65rem;
+  }
+
+  label {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    cursor: pointer;
+  }
+
+  input {
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: .27rem;
+    accent-color: var(--olive);
+  }
+
+  input:checked + span {
+    color: var(--muted);
+    text-decoration: line-through;
+  }
+</style>

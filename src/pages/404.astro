@@ -1,0 +1,55 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { BASE } from "../lib/site";
+---
+
+<BaseLayout title="页面没有找到" pagefind={false}>
+  <section class="not-found site-shell">
+    <span>404</span>
+    <div>
+      <p class="eyebrow">Lost context</p>
+      <h1>Agent 找不到<br />这个页面。</h1>
+      <p>可能是链接已经变化，也可能是地址多了一个字符。返回首页，或者用站内搜索重新定位。</p>
+      <p>
+        <a class="button" href={BASE}>返回首页</a>
+        <a class="button secondary" href={`${BASE}search/`}>站内搜索</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    min-height: 68vh;
+    grid-template-columns: 1fr 2fr;
+    align-items: center;
+    gap: 4rem;
+    padding-block: 5rem;
+  }
+
+  .not-found > span {
+    color: var(--red);
+    font: 800 clamp(8rem, 22vw, 20rem)/.8 var(--serif);
+    opacity: .18;
+  }
+
+  h1 {
+    margin: 0;
+    font: 760 clamp(3rem, 7vw, 6.5rem)/1 var(--serif);
+  }
+
+  .not-found div > p:not(.eyebrow) {
+    max-width: 540px;
+  }
+
+  .not-found .button {
+    margin: 1rem 1rem 0 0;
+  }
+
+  @media (max-width: 720px) {
+    .not-found {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

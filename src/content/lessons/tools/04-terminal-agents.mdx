@@ -1,0 +1,69 @@
+---
+title: "终端 Agent：把工程命令变成协作语言"
+description: "比较 OpenCode、Claude Code、Codex CLI、Gemini CLI 的共同工作方式，并建立不依赖品牌的使用原则。"
+section: tools
+order: 4
+estimatedMinutes: 11
+prerequisites: ["完成 OpenCode 介绍"]
+outcomes:
+  - "理解终端 Agent 的共享工作循环"
+  - "知道 Harness 和模型能力必须一起评估"
+  - "用仓库验证命令约束 Agent"
+tags: ["CLI", "Claude Code", "Codex", "Gemini CLI"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["各工具官方文档"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+
+OpenCode、Claude Code、Codex CLI 和 Gemini CLI 的产品细节不同，但都围绕同一件事：让模型在终端里调用文件、搜索、Shell 和编辑工具，形成一个 Agent 循环。
+
+## 真正可迁移的能力
+
+不要只学某个斜杠命令。更值得练习的是：
+
+- 在任务开始前检查 `git status`；
+- 给出目标、范围和验收标准；
+- 要求先读相关文件再计划；
+- 控制一次修改的大小；
+- 指定必须运行的测试或构建；
+- 审查 Diff，并在异常时回退。
+
+这些能力换一个 CLI 仍然成立。
+
+## 为什么模型相同，结果仍会不同
+
+Agent Harness 会决定：
+
+- 系统提示如何描述工具；
+- 哪些文件被自动加入上下文；
+- 命令如何审批和沙箱化；
+- 长对话如何压缩；
+- Diff 如何生成、应用和回退；
+- 失败后是否自动重试。
+
+因此“模型 A 在工具 X 里很好用”不能直接推出它在工具 Y 里表现相同。
+
+## 终端的优势也是风险
+
+终端拥有项目最真实的反馈：命令成功或失败、测试通过或失败、文件是否存在。但终端也能访问凭证、网络和系统资源。
+
+<Callout type="warning" title="把命令输出当作证据，不把命令权限当作默认">
+  允许 Agent 运行项目内的只读检查和测试，与允许它修改系统、访问任意网络或删除目录，是完全不同的授权等级。
+</Callout>
+
+## 一个品牌无关的任务模板
+
+```text
+目标：修复移动端导航遮挡正文的问题。
+范围：只修改导航组件和相关样式；不要升级依赖。
+先做：读取组件、全局样式和现有浏览器测试，给出 3–5 步计划。
+验收：
+1. 375px 与 1280px 视口均可导航；
+2. 键盘可打开菜单并访问全部链接；
+3. npm test 通过；
+4. 汇总实际修改和仍存在的风险。
+```
+
+当工具换掉时，这种任务描述仍然有效。
