@@ -4,6 +4,7 @@ export const SITE_TITLE = "Vibe Coding：从感觉到工程";
 export const SITE_DESCRIPTION =
   "面向企业环境零基础创作者的 Vibe Coding 中文教程：从 OpenCode 配置到可验证的软件交付。";
 export const BASE = `${import.meta.env.BASE_URL.replace(/\/+$/, "")}/`;
+export const TOTAL_LESSONS = 27;
 
 export const sections = {
   history: { label: "历史切片", index: "01", color: "朱红" },

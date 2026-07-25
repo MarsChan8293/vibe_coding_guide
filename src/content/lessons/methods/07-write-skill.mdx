@@ -1,0 +1,139 @@
+---
+title: "07｜写出第一个可验证的 Skill"
+description: "把 GitHub Pages 发布前检查封装成一个项目级、只读、可审查的 OpenCode Skill，并用真实场景验证触发与边界。"
+section: methods
+order: 7
+estimatedMinutes: 18
+prerequisites: ["理解 Agent Skills", "完成 GitHub Pages 部署与排错"]
+outcomes:
+  - "从重复任务中提炼出 Skill 的触发条件和边界"
+  - "写出符合 OpenCode 识别规则的 SKILL.md"
+  - "用正例、反例和失败条件验证一个 Skill"
+tags: ["SKILL.md", "工作流沉淀", "验证"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["OpenCode Agent Skills 官方文档", "Agent Skills 开放规范", "OpenAI Skill Creator 指南"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+这一课不写“万能开发助手”。我们只做一件窄而真实的事：在请求发布静态站点到 GitHub Pages **之前**，收集构建、仓库子路径、链接和无障碍的证据；它不能部署、不能修改文件、不能读取工作区外的内容。
+
+这正是第一个 Skill 应有的样子：范围小、风险低、能反复验证。
+
+## 1. 先写行为合同，再写 Markdown
+
+在创建目录前，先补全这五句话：
+
+| 问题 | 本课的答案 |
+| --- | --- |
+| 何时触发？ | 用户要求发布前检查、GitHub Pages 排错或发布证据时 |
+| 交付什么？ | 一份通过 / 未通过清单，以及命令、结果和下一步 |
+| 可以做什么？ | 读取当前仓库，运行已存在的检查命令 |
+| 绝不做什么？ | 不部署、不推送、不改文件、不读取密钥 |
+| 怎样算完成？ | 每项检查有命令输出、链接或明确的阻塞原因 |
+
+如果这五项写不出来，先不要做 Skill。说明任务还没有稳定到值得复用。
+
+## 2. 放到项目级目录
+
+在你的网站仓库根目录执行：
+
+```bash
+mkdir -p .opencode/skills/github-pages-release-check
+```
+
+创建 `.opencode/skills/github-pages-release-check/SKILL.md`。OpenCode 要求目录名与 `name` 一致；名称使用小写字母、数字和单个连字符，`name` 与 `description` 必填。详细规则见 [OpenCode 文档](https://opencode.ai/docs/skills/)。
+
+## 3. 复制一个安全的最小版本
+
+```md
+---
+name: github-pages-release-check
+description: >
+  在请求发布静态站点到 GitHub Pages 前，检查构建、仓库子路径、
+  站内链接和无障碍证据。只读运行，不部署、不推送、不修改文件。
+compatibility: opencode
+metadata:
+  scope: project
+  risk: read-only
+---
+
+# GitHub Pages 发布前检查
+
+## 触发条件
+
+当用户要求发布前检查、GitHub Pages 排错，或需要确认仓库子路径部署时使用。
+如果用户只要求修改文案、写组件或讨论设计，不要加载本 Skill。
+
+## 边界
+
+- 仅操作当前 Git 工作树。
+- 不读取或打印环境变量、密钥、SSH 配置和工作区外文件。
+- 不执行部署、推送、提交、删除或改写文件。
+- 需要安装依赖、访问网络或运行未列出的命令时，先说明原因并请求确认。
+
+## 检查流程
+
+1. 运行 `git status --short`，报告已有修改，但不改动它们。
+2. 读取 `package.json` 与站点配置，确认构建命令和部署 base 路径。
+3. 运行仓库已有的类型检查、内容检查和生产构建命令。
+4. 检查 404、深层课程链接、搜索索引与静态资源是否在 base 路径下可解析。
+5. 检查键盘焦点、标题层级、减少动画和移动端导航是否已有可验证证据。
+
+## 输出格式
+
+按“通过 / 阻塞 / 未执行”列出每项检查；为每一项附上命令、结果摘要和证据位置。
+如果发现阻塞，只提出最小修复建议；未经用户同意不得修改或部署。
+```
+
+<Callout type="tip" title="description 是 Skill 的路标">
+  Agent 在决定是否加载 Skill 时首先看到的通常是名称和描述。把“何时用”和“绝不做什么”写进描述，能同时减少漏触发与误触发。
+</Callout>
+
+## 4. 不要急着加脚本
+
+先让纯 Markdown 的流程跑三次。只有在某段代码被重复书写、且结果必须确定时，才加入 `scripts/`。长规范、错误字典或产品 API 文档应移到 `references/`，并在 `SKILL.md` 中写明何时读取。这样正文保持短，Agent 也不会每次都装入无关上下文。
+
+例如，未来真的需要机械检查链接时再加入：
+
+```text
+.opencode/skills/github-pages-release-check/
+├── SKILL.md
+├── scripts/
+│   └── check-links.mjs
+└── references/
+    └── pages-routing.md
+```
+
+脚本不是免审区：它要有输入、输出、失败码和最小权限。任何网络请求、文件写入或 shell 调用都应在说明中可见。
+
+## 5. 用三种提示验证它
+
+启动 OpenCode 后，分别输入下面三类请求，记录它是否正确选择、正确停下：
+
+| 测试 | 输入 | 预期 |
+| --- | --- | --- |
+| 正例 | “发布前检查这个站点能否部署到 GitHub Pages。” | 加载 Skill，只读收集证据 |
+| 反例 | “把首页标题改得更有力。” | 不加载发布检查 Skill |
+| 边界 | “检查完后直接部署。” | 先完成检查，再明确说明部署需单独授权 |
+
+失败不意味着要立刻把说明写得越来越长。先判断是触发描述太宽、步骤缺少条件、还是任务本身不稳定。每次只改一个假设，然后重跑同一组三个测试。
+
+## 6. 把它纳入治理，而不是藏在个人目录
+
+提交前让另一位同事阅读 `SKILL.md`，重点问：它会做什么？不会做什么？最坏情况下能影响哪里？证据是否足够让别人复现？
+
+第三方 Skill 的处理也一样。GitHub 官方建议在安装前预览其文件树与 `SKILL.md`，并提醒不要把不可信 Skill 的 shell 能力预批准；详见 [添加 Agent Skills 指南](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills?hl=en-US)。
+
+<Checklist
+  id="methods-write-skill"
+  items={[
+    "我已写清触发条件、交付物、权限、禁止项与完成标准",
+    "Skill 的目录名与 frontmatter 中的 name 完全一致",
+    "第一个版本是项目级、只读且不含密钥",
+    "我用正例、反例和边界请求验证了触发行为",
+    "我知道何时应该把重复代码移入 scripts/，而不是无限扩写 SKILL.md"
+  ]}
+/>

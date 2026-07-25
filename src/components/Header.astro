@@ -1,5 +1,5 @@
 ---
-import { BASE } from "../lib/site";
+import { BASE, TOTAL_LESSONS } from "../lib/site";
 
 const nav = [
   { href: `${BASE}history/`, label: "历史" },
@@ -26,7 +26,7 @@ const nav = [
         <span>搜索</span>
       </a>
       <span class="mini-progress" aria-label="课程完成进度">
-        <span data-progress-count>0/24</span>
+        <span data-progress-count>0/{TOTAL_LESSONS}</span>
       </span>
       <details class="mobile-menu">
         <summary aria-label="打开导航">目录</summary>

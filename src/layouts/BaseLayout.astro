@@ -1,7 +1,7 @@
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import { BASE, SITE_DESCRIPTION, SITE_TITLE } from "../lib/site";
+import { BASE, SITE_DESCRIPTION, SITE_TITLE, TOTAL_LESSONS } from "../lib/site";
 import "../styles/global.css";
 
 interface Props {
@@ -37,7 +37,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     </main>
     <Footer />
 
-    <script is:inline define:vars={{ base: BASE }}>
+    <script is:inline define:vars={{ totalLessons: TOTAL_LESSONS }}>
       const STORAGE_KEY = "vibe-guide:progress:v1";
       const readProgress = () => {
         try {
@@ -54,10 +54,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         const state = readProgress();
         const completed = Object.values(state.lessons || {}).filter(Boolean).length;
         document.querySelectorAll("[data-progress-count]").forEach((node) => {
-          node.textContent = `${completed}/24`;
+          node.textContent = `${completed}/${totalLessons}`;
         });
         document.querySelectorAll("[data-progress-bar]").forEach((node) => {
-          node.style.setProperty("--progress", `${(completed / 24) * 100}%`);
+          node.style.setProperty("--progress", `${(completed / totalLessons) * 100}%`);
           node.setAttribute("aria-valuenow", String(completed));
         });
         document.querySelectorAll("[data-lesson-toggle]").forEach((button) => {

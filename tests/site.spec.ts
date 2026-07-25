@@ -18,6 +18,16 @@ test("历史时间轴可展开且包含八个节点", async ({ page }) => {
   await expect(nodes.nth(1)).toContainText("Vibe Coding");
 });
 
+test("Skill 课程覆盖概念、图谱与编写实践", async ({ page }) => {
+  await page.goto("./tools/agent-skills/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Skill");
+  await expect(page.getByRole("heading", { name: "它和 MCP、AGENTS.md、脚本有什么不同？" })).toBeVisible();
+  await page.getByRole("link", { name: /下一篇/ }).click();
+  await expect(page).toHaveURL(/\/tools\/skill-map\/?$/);
+  await page.goto("./methods/write-skill/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("第一个可验证的 Skill");
+});
+
 test("中文搜索可以找到课程", async ({ page }) => {
   await page.goto("./search/");
   await page.getByRole("searchbox").fill("OpenCode");

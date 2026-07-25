@@ -2,7 +2,7 @@
 import type { LessonEntry } from "../lib/site";
 import BaseLayout from "./BaseLayout.astro";
 import ProgressToggle from "../components/ProgressToggle.astro";
-import { lessonPath, sections } from "../lib/site";
+import { lessonPath, sections, TOTAL_LESSONS } from "../lib/site";
 
 interface Props {
   entry: LessonEntry;
@@ -40,11 +40,11 @@ const lessonId = entry.id.replace(/\.(md|mdx)$/, "");
         role="progressbar"
         aria-label="全课程完成进度"
         aria-valuemin="0"
-        aria-valuemax="24"
+        aria-valuemax={TOTAL_LESSONS}
         aria-valuenow="0"
       >
         <span>课程进度</span>
-        <strong data-progress-count>0/24</strong>
+        <strong data-progress-count>0/{TOTAL_LESSONS}</strong>
       </div>
       <button class="sidebar-reset" type="button" data-progress-reset>重置本地进度</button>
     </aside>

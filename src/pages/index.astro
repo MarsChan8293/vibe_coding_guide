@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { BASE, lessonPath, sections, sortedLessons } from "../lib/site";
+import { BASE, lessonPath, sections, sortedLessons, TOTAL_LESSONS } from "../lib/site";
 
 const lessons = sortedLessons(await getCollection("lessons", ({ data }) => !data.draft));
 const chapterCards = Object.entries(sections).map(([key, section]) => {
@@ -37,7 +37,7 @@ const chapterCards = Object.entries(sections).map(([key, section]) => {
       仍然握在你手里。
     </p>
     <div class="hero-seal" aria-hidden="true">
-      <span>24</span>
+      <span>{TOTAL_LESSONS}</span>
       <small>LESSONS<br />ZERO TO SHIP</small>
     </div>
   </section>
@@ -46,7 +46,7 @@ const chapterCards = Object.entries(sections).map(([key, section]) => {
     <div class="site-shell progress-inner">
       <div>
         <span>你的本地学习进度</span>
-        <strong data-progress-count>0/24</strong>
+        <strong data-progress-count>0/{TOTAL_LESSONS}</strong>
       </div>
       <div
         class="progress-track"
@@ -54,7 +54,7 @@ const chapterCards = Object.entries(sections).map(([key, section]) => {
         role="progressbar"
         aria-label="全课程完成进度"
         aria-valuemin="0"
-        aria-valuemax="24"
+        aria-valuemax={TOTAL_LESSONS}
         aria-valuenow="0"
       ></div>
       <button type="button" data-progress-reset>清除进度</button>
