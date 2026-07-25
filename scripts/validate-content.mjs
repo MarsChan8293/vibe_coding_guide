@@ -16,7 +16,7 @@ const requiredFields = [
   "reviewedAgainst",
   "draft",
 ];
-const expected = { history: 1, tools: 6, practice: 11, methods: 6 };
+const expected = { history: 1, tools: 8, practice: 11, methods: 7 };
 const errors = [];
 
 async function walk(directory) {
@@ -63,8 +63,8 @@ for (const file of files) {
   }
 }
 
-if (files.length !== 24) {
-  errors.push(`核心内容应为 24 篇，实际为 ${files.length} 篇`);
+if (files.length !== 27) {
+  errors.push(`核心内容应为 27 篇，实际为 ${files.length} 篇`);
 }
 for (const [section, count] of Object.entries(expected)) {
   if (counts[section] !== count) {
@@ -76,4 +76,4 @@ if (errors.length) {
   console.error(errors.map((error) => `× ${error}`).join("\n"));
   process.exit(1);
 }
-console.log(`✓ 24 篇核心内容完整：${JSON.stringify(counts)}`);
+console.log(`✓ 27 篇核心内容完整：${JSON.stringify(counts)}`);

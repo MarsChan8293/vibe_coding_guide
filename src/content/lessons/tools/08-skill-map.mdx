@@ -1,0 +1,93 @@
+---
+title: "08｜常用 Skill 图谱：先审计，再安装"
+description: "用高复用任务而非下载榜选择 Skill，并建立来源、权限、脚本与验证四步审计法。"
+section: tools
+order: 8
+estimatedMinutes: 13
+prerequisites: ["理解 Skill 的作用域与渐进加载", "了解企业选型边界"]
+outcomes:
+  - "按任务类别识别高复用的 Skill"
+  - "在安装前审计 SKILL.md、脚本、依赖与网络权限"
+  - "为团队建立可撤销的 Skill 引入记录"
+tags: ["Skill 图谱", "供应链安全", "审计"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["GitHub Agent Skills 官方文档", "OpenCode Agent Skills 官方文档", "OpenAI Skills 仓库"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+“流行”不是安全、适配或高质量的同义词。Skill 市场变化很快，一份下载排行榜也会很快过期；更可靠的起点是找那些跨项目反复出现、输入和验收都清楚的任务类型。
+
+下面是当前最值得零基础团队认识的高复用图谱。名称是常见能力标签，不承诺每个 Agent 都用同一个安装命令或目录。
+
+| 能力类别 | 常见 Skill | 用它解决什么 | 最小验收 |
+| --- | --- | --- | --- |
+| 文档 | `documents`、`docx` | 生成、修改和渲染校验 Word 文档 | 文件能打开、版式截图已检查 |
+| PDF | `pdf` | 提取、填写、拆分、渲染 PDF | 页数、字段、渲染结果正确 |
+| 表格 | `spreadsheets`、`xlsx` | 计算、格式化、图表和公式检查 | 公式重算、关键单元格正确 |
+| 演示 | `presentations`、`pptx` | 生成或修订幻灯片 | 导出后逐页视觉检查 |
+| 前端 | `frontend-design` | 形成有明确视觉方向的页面与组件 | 响应式、键盘与对比度检查 |
+| 浏览器测试 | `webapp-testing`、`agent-browser` | 操作网页、回归关键用户路径 | 测试报告、截图和控制台无错误 |
+| 工程协作 | `gh-fix-ci`、`gh-address-comments` | 定位 CI 失败、处理 PR 评审意见 | 修复有测试、Diff 可审查 |
+
+这些例子共同的特点是：只靠“请你做得专业一点”通常不够。它们需要固定的工具、检查顺序与产物证据，因此很适合包装成 Skill。
+
+## 安装前的四步审计
+
+### 1. 读全量内容，而不只看介绍
+
+查看 `SKILL.md`、它引用的文件、`scripts/` 中的每一个可执行文件，以及安装说明。不要把网页、Issue、README 或 Skill 正文当成可信指令；它们都可能包含诱导 Agent 越权的文本。
+
+### 2. 画出权限账单
+
+写下它会不会：读取工作区外文件、执行 shell、联网、写入 Git、上传内容、调用浏览器或需要密钥。看不懂就不要把它放到全局目录。
+
+### 3. 固定来源与版本
+
+记录仓库、提交 SHA / tag、引入人、审计日期和撤销方式。GitHub 的 `gh skill` 支持预览、固定版本和更新检查，但 [官方文档也明确提醒](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills?hl=en-US#adding-a-skill-that-someone-else-has-created)：社区 Skill 可能带有提示注入或恶意脚本，安装前必须检查内容。
+
+### 4. 在最小权限下做一次真任务
+
+先在测试仓库、临时分支或只读副本运行。不要把“能加载”当成“可以上线”。记录它实际读取的文件、执行的命令、修改的范围与验证结果。
+
+<Callout type="warning" title="不要预授权 shell">
+  一些 Agent 支持在 Skill 元数据中预批准 shell 或 bash。除非你已逐行审查该 Skill 及所有被调用脚本，否则不要这样做。省掉一次确认，可能意味着把任意命令的执行权交给不可信文本。
+</Callout>
+
+## 一张团队引入卡
+
+把下面这张卡与 Skill 一起提交到内部记录中。它比“某同事说很好用”更容易审查和撤销。
+
+```text
+Skill 名称：
+任务边界：
+来源仓库与固定版本：
+包含脚本 / 外部依赖：
+需要的权限：读 / 写 / shell / 网络 / 浏览器 / 密钥
+禁止做什么：
+试运行证据：
+负责人、审计日期、下次复审日期：
+撤销方式：删除哪个目录、关闭哪项权限：
+```
+
+## 哪些情况不该安装？
+
+- 只有夸张效果描述，没有源码、版本或维护者；
+- 要求关闭确认、复制令牌、粘贴客户数据或扩大目录权限；
+- 功能只是一次性查询或一条简单命令；
+- 你无法解释它在失败时会停在哪里；
+- 团队没有人愿意对它的升级负责。
+
+与其盲目安装十个 Skill，不如先把一个“发布前检查”写清、跑通、审计完。下一课会带你完成这个 Skill。
+
+<Checklist
+  id="tools-skill-map"
+  items={[
+    "我会按任务价值选择 Skill，而不是追逐下载榜",
+    "我会审计 SKILL.md、引用资源、脚本和网络行为",
+    "我会为第三方 Skill 固定来源、版本和负责人",
+    "我知道 Skill 的成功标准必须包含可观察的验证证据"
+  ]}
+/>
