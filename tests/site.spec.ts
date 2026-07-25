@@ -18,6 +18,15 @@ test("历史时间轴可展开且包含八个节点", async ({ page }) => {
   await expect(nodes.nth(1)).toContainText("Vibe Coding");
 });
 
+test("模型地图覆盖约定的六个模型家族", async ({ page }) => {
+  await page.goto("./tools/map/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("模型地图");
+  const lesson = page.locator(".prose");
+  for (const model of ["Claude", "OpenAI", "Gemini", "DeepSeek", "GLM", "Kimi"]) {
+    await expect(lesson).toContainText(model);
+  }
+});
+
 test("Skill 课程覆盖概念、图谱与编写实践", async ({ page }) => {
   await page.goto("./tools/agent-skills/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Skill");
