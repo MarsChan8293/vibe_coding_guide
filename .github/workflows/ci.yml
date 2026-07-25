@@ -1,0 +1,36 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Check external links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # OpenAI and Collins block requests from GitHub-hosted runners.
+          args: >-
+            --no-progress
+            --accept '200..=299,429'
+            --exclude '^https://marschan8293\.github\.io/vibe_coding_guide/'
+            --exclude '^https://openai\.com/'
+            --exclude '^https://www\.collinsdictionary\.com/'
+            'README.md'
+            './src/content/**/*.mdx'
+            './src/pages/resources.astro'
+            './src/components/Footer.astro'
+          fail: true

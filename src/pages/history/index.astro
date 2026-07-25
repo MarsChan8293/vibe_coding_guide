@@ -1,0 +1,16 @@
+---
+import { getCollection, getEntry, render } from "astro:content";
+import LessonLayout from "../../layouts/LessonLayout.astro";
+import { sortedLessons } from "../../lib/site";
+
+const entry = await getEntry("lessons", "history/01-timeline");
+if (!entry) throw new Error("History timeline lesson not found");
+const allLessons = sortedLessons(
+  await getCollection("lessons", ({ data }) => !data.draft)
+);
+const { Content } = await render(entry);
+---
+
+<LessonLayout entry={entry} allLessons={allLessons}>
+  <Content />
+</LessonLayout>

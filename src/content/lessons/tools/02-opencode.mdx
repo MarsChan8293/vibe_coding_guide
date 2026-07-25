@@ -1,0 +1,79 @@
+---
+title: "OpenCode：可替换模型的终端工作台"
+description: "理解 OpenCode 的工作循环、配置层级、权限与适用边界，为后面的企业 API 实践建立准确心智模型。"
+section: tools
+order: 2
+estimatedMinutes: 13
+prerequisites: ["理解工具三层模型"]
+outcomes:
+  - "解释 OpenCode 如何读文件、调用命令和修改项目"
+  - "理解全局配置与项目配置的区别"
+  - "识别需要人工审批的高风险操作"
+tags: ["OpenCode", "终端 Agent"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["https://opencode.ai/docs/", "https://opencode.ai/docs/config/"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+OpenCode 是一个运行在终端中的开源 Coding Agent。它不是模型，也不会自己“思考”；它负责把你的指令、项目文件、工具结果和模型回复组织成一个可执行循环。
+
+## 一次任务里发生了什么
+
+当你输入“为首页增加移动端导航”时，OpenCode 通常会经历：
+
+1. 搜索项目结构和相关组件；
+2. 读取现有样式与约定；
+3. 向模型请求分析或计划；
+4. 修改一个或多个文件；
+5. 运行检查、测试或构建；
+6. 根据错误继续修正；
+7. 汇总改动和验证结果。
+
+真正决定质量的，不只有模型。项目里是否有清楚的 README、测试命令、类型定义和约束，也会改变结果。
+
+## 配置放在哪里
+
+OpenCode 支持多层配置。对本教程最重要的是：
+
+- 全局配置：`~/.config/opencode/opencode.json`，适合企业模型 Provider 和个人偏好；
+- 项目配置：项目根目录的 `opencode.json`，适合项目专属规则；
+- 项目说明：README、AGENTS.md 或通过 `instructions` 引用的文件。
+
+Provider 通常放在全局配置，避免每个项目重复；项目可提交的配置里不要包含密钥。
+
+## OpenCode 能做什么，也可能做错什么
+
+它可以搜索文件、生成 Diff、执行 Git 与测试命令。正因为它能动手，风险也从“回答错误”升级为“修改错误”：
+
+- 大范围覆盖用户已有修改；
+- 安装名字相似但恶意的依赖；
+- 把密钥写进配置或日志；
+- 运行破坏性命令；
+- 在测试不足时声称任务已完成。
+
+<Callout type="warning" title="默认保持可回退">
+  在干净的 Git 工作区开始任务；让 OpenCode 先展示计划；每个可验证阶段都提交一次；对删除、网络访问、系统级安装和凭证操作保持人工审批。
+</Callout>
+
+## 选择 OpenCode 的边界
+
+它特别适合模型必须走企业 API、开发发生在 Linux、工作需要脚本化的环境。以下场景可能不适合：
+
+- 读者完全无法使用终端；
+- 企业只允许某个已审计 IDE 插件；
+- 任务需要使用只有特定云 Agent 才提供的隔离环境；
+- 项目没有任何可运行的验证方式，且风险很高。
+
+工具不是安全边界的替代品。OpenCode 给你可观察的终端过程，但你仍要决定它能读什么、能执行什么、何时停下。
+
+<Checklist
+  id="tools-opencode"
+  items={[
+    "我知道 OpenCode 是 Agent 工具而不是模型",
+    "我能说出全局配置与项目配置各自适合放什么",
+    "我会在修改前确认 Git 工作区状态并保留回退点"
+  ]}
+/>

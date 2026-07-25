@@ -1,0 +1,124 @@
+---
+title: "04｜连接企业模型 API"
+description: "用环境变量和通用 Provider 模板把 OpenCode 接入企业 OpenAI 兼容接口，不把密钥写进仓库。"
+section: practice
+order: 4
+estimatedMinutes: 22
+prerequisites: ["OpenCode 已安装", "管理员已提供模型接入信息"]
+outcomes:
+  - "安全设置 Base URL 与 API Key"
+  - "配置 OpenAI-compatible 自定义 Provider"
+  - "定位认证、模型名和接口类型错误"
+tags: ["OpenAI-compatible", "API Key", "Provider"]
+reviewedAt: "2026-07-25"
+reviewedAgainst:
+  - "https://opencode.ai/docs/providers/"
+  - "https://opencode.ai/docs/config/"
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+本教程假设模型服务已经由企业部署。你的工作不是管理 H20、昇腾 910C 或推理框架，而是把管理员提供的接口安全地交给 OpenCode。
+
+## 先在当前终端设置变量
+
+把占位符替换为管理员提供的值，但不要把真实命令复制进聊天记录：
+
+```bash
+export VIBE_BASE_URL="https://gateway.example.invalid/v1"
+export VIBE_API_KEY="replace-with-secret-from-approved-channel"
+```
+
+检查变量是否存在，不打印完整内容：
+
+```bash
+printf 'base_url_set=%s\n' "$([ -n "$VIBE_BASE_URL" ] && echo yes || echo no)"
+printf 'api_key_set=%s\n' "$([ -n "$VIBE_API_KEY" ] && echo yes || echo no)"
+```
+
+密钥只对当前终端会话有效。长期保存应使用企业 Secret 工具；不要直接写进 `.bashrc`、README 或项目 `.env` 后提交。
+
+## 创建全局 Provider 配置
+
+打开 `~/.config/opencode/opencode.json`，使用以下模板：
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "share": "disabled",
+  "provider": {
+    "enterprise": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Enterprise Model Gateway",
+      "options": {
+        "baseURL": "{env:VIBE_BASE_URL}",
+        "apiKey": "{env:VIBE_API_KEY}"
+      },
+      "models": {
+        "<MODEL_ID>": {
+          "name": "Enterprise Coding Model"
+        }
+      }
+    }
+  },
+  "model": "enterprise/<MODEL_ID>"
+}
+```
+
+将两个 `<MODEL_ID>` 替换为管理员给出的精确模型 ID。保留引号。
+
+<Callout type="enterprise" title="接口类型要匹配">
+  `/v1/chat/completions` 类接口使用 `@ai-sdk/openai-compatible`。若管理员明确说明只支持 `/v1/responses`，应按 OpenCode 官方文档改用 `@ai-sdk/openai`。不要靠反复试错猜接口。
+</Callout>
+
+## 启动并确认模型
+
+```bash
+cd "$HOME/workspace/vibe-portfolio"
+opencode
+```
+
+在 OpenCode 中打开模型列表，确认能看到 `Enterprise Model Gateway` 和你的模型。先发送一个无敏感信息的测试：
+
+```text
+只回复：连接成功。不要读取或修改任何文件。
+```
+
+然后退出，检查仓库：
+
+```bash
+git status
+```
+
+应该没有新修改。
+
+## 三类常见错误
+
+### 401 或 403
+
+Key 缺失、过期、权限不足，或网关要求自定义 Header。不要把 Key 打印出来；重新通过批准渠道获取。
+
+### 404 或 Route not found
+
+Base URL 缺少 `/v1`、多了一段路径，或者 SDK 与接口类型不匹配。
+
+### Model not found
+
+`models` 中的键与网关真实模型 ID 不一致。显示名称可以自定义，模型 ID 必须精确。
+
+<Callout type="warning" title="发现泄露立即轮换">
+  如果真实 Key 出现在 Git、截图、终端录屏或公共聊天中，不要只删除消息。立即联系管理员撤销并生成新 Key，再检查是否已被使用。
+</Callout>
+
+<Checklist
+  id="practice-api"
+  items={[
+    "Base URL 和 API Key 只通过环境变量提供",
+    "OpenCode 配置中没有真实密钥",
+    "Provider 使用与接口匹配的 AI SDK 包",
+    "模型列表能看到企业模型",
+    "无文件读取测试成功且 git status 仍干净"
+  ]}
+/>

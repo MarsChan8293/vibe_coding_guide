@@ -1,0 +1,533 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { BASE, lessonPath, sections, sortedLessons } from "../lib/site";
+
+const lessons = sortedLessons(await getCollection("lessons", ({ data }) => !data.draft));
+const chapterCards = Object.entries(sections).map(([key, section]) => {
+  const chapterLessons = lessons.filter((lesson) => lesson.data.section === key);
+  return {
+    key,
+    ...section,
+    count: chapterLessons.length,
+    minutes: chapterLessons.reduce((sum, lesson) => sum + lesson.data.estimatedMinutes, 0),
+    href: lessonPath(chapterLessons[0])
+  };
+});
+---
+
+<BaseLayout pagefind={false}>
+  <section class="hero site-shell">
+    <div class="hero-issue">
+      <span>FIELD GUIDE</span>
+      <span>ISSUE 2026.01</span>
+    </div>
+    <div class="hero-title">
+      <span class="hero-kicker">VIBE</span>
+      <h1>从感觉<br />到<span>工程</span></h1>
+    </div>
+    <div class="hero-rail">
+      <p>一份写给零基础创作者的<br /><strong>Agentic Coding 实战手册</strong></p>
+      <p>Linux · OpenCode · 企业模型 API · GitHub Pages</p>
+      <a class="button" href={`${BASE}start/`}>开始阅读 <span>→</span></a>
+    </div>
+    <p class="hero-manifesto">
+      让 Agent 写得更快。<br />
+      让需求、测试与责任<br />
+      仍然握在你手里。
+    </p>
+    <div class="hero-seal" aria-hidden="true">
+      <span>24</span>
+      <small>LESSONS<br />ZERO TO SHIP</small>
+    </div>
+  </section>
+
+  <section class="progress-band">
+    <div class="site-shell progress-inner">
+      <div>
+        <span>你的本地学习进度</span>
+        <strong data-progress-count>0/24</strong>
+      </div>
+      <div
+        class="progress-track"
+        data-progress-bar
+        role="progressbar"
+        aria-label="全课程完成进度"
+        aria-valuemin="0"
+        aria-valuemax="24"
+        aria-valuenow="0"
+      ></div>
+      <button type="button" data-progress-reset>清除进度</button>
+    </div>
+  </section>
+
+  <section class="chapters site-shell" aria-labelledby="chapters-title">
+    <header class="section-head">
+      <p class="eyebrow">Reading route</p>
+      <h2 id="chapters-title">四章，把灵感<br />变成可交付的软件</h2>
+      <p>历史只负责解释“为什么现在可以”；剩下的篇幅，用来教你如何选择工具、完成作品，并建立不靠运气的协作方式。</p>
+    </header>
+    <div class="chapter-grid">
+      {chapterCards.map((chapter, index) => (
+        <a class:list={["chapter-card", `chapter-${chapter.key}`]} href={chapter.href}>
+          <span class="card-index">{chapter.index}</span>
+          <div>
+            <p>{String(index + 1).padStart(2, "0")} / {chapter.count} LESSONS</p>
+            <h3>{chapter.label}</h3>
+            <span>{chapter.minutes} 分钟 · 进入章节 →</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="thesis">
+    <div class="site-shell thesis-grid">
+      <p class="thesis-number">01</p>
+      <div>
+        <p class="eyebrow">Our position</p>
+        <h2>Vibe Coding<br />不是不看代码。</h2>
+      </div>
+      <div class="thesis-copy">
+        <p>它首先是一种降低表达门槛的创作方式。但当作品要被他人使用时，“感觉正确”必须升级为“证据充分”。</p>
+        <p>所以这本手册不教你寻找万能 Prompt。它教你怎样给 Agent 足够清晰的目标、怎样切小任务、怎样验证每次修改，以及什么时候必须停下来人工判断。</p>
+        <a href={`${BASE}methods/verification/`}>阅读验证方法 →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="workflow site-shell">
+    <p class="eyebrow">The loop</p>
+    <h2>一个循环，贯穿全部实践</h2>
+    <ol>
+      <li><span>01</span><strong>说清目标</strong><small>Outcome</small></li>
+      <li><span>02</span><strong>先做计划</strong><small>Plan</small></li>
+      <li><span>03</span><strong>小步实现</strong><small>Build</small></li>
+      <li><span>04</span><strong>拿证据验证</strong><small>Verify</small></li>
+      <li><span>05</span><strong>审查与复盘</strong><small>Review</small></li>
+    </ol>
+  </section>
+
+  <section class="closing site-shell">
+    <p>你不需要先成为程序员。</p>
+    <h2>从一台 Linux 电脑、<br />一个模型接口开始。</h2>
+    <a class="button" href={`${BASE}start/`}>查看准备清单 →</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 760px;
+    padding: 3rem 0 5rem;
+    border-right: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+
+  .hero::before {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    right: 23%;
+    bottom: 0;
+    width: 1px;
+    content: "";
+    background: var(--line);
+  }
+
+  .hero-issue {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 1.5rem 1.2rem;
+    border-bottom: 1px solid var(--line);
+    font: 650 .66rem/1 var(--mono);
+    letter-spacing: .12em;
+  }
+
+  .hero-title {
+    position: relative;
+    padding: 4rem 1.5rem 0;
+  }
+
+  .hero-kicker {
+    position: absolute;
+    top: 3.8rem;
+    left: 1.3rem;
+    color: var(--red);
+    font: 800 clamp(5rem, 16vw, 15rem)/.7 var(--sans);
+    letter-spacing: -.09em;
+    opacity: .13;
+  }
+
+  .hero h1 {
+    position: relative;
+    max-width: 980px;
+    margin: 0;
+    font: 780 clamp(5rem, 12vw, 11rem)/.83 var(--serif);
+    letter-spacing: -.08em;
+  }
+
+  .hero h1 span {
+    margin-left: clamp(3rem, 16vw, 15rem);
+    color: var(--red);
+    font-style: italic;
+  }
+
+  .hero-rail {
+    position: absolute;
+    top: 22%;
+    right: 2.5%;
+    display: grid;
+    width: 19%;
+    gap: 1rem;
+  }
+
+  .hero-rail p {
+    margin: 0;
+    font-size: .82rem;
+    line-height: 1.65;
+  }
+
+  .hero-rail p:nth-child(2) {
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font: .66rem/1.6 var(--mono);
+  }
+
+  .hero-manifesto {
+    margin: 4rem 0 0 4%;
+    font: 520 clamp(1.1rem, 2vw, 1.45rem)/1.6 var(--serif);
+  }
+
+  .hero-seal {
+    position: absolute;
+    right: 7%;
+    bottom: 7%;
+    display: grid;
+    width: 130px;
+    height: 130px;
+    place-items: center;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    text-align: center;
+    transform: rotate(8deg);
+  }
+
+  .hero-seal span {
+    margin-bottom: -2rem;
+    color: var(--red);
+    font: 800 3.2rem/1 var(--serif);
+  }
+
+  .hero-seal small {
+    font: 650 .55rem/1.4 var(--mono);
+    letter-spacing: .08em;
+  }
+
+  .progress-band {
+    border-block: 1px solid var(--ink);
+    color: var(--paper);
+    background: var(--ink);
+  }
+
+  .progress-inner {
+    display: grid;
+    min-height: 76px;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .progress-inner > div:first-child {
+    display: flex;
+    gap: 1rem;
+    font: .68rem/1 var(--mono);
+  }
+
+  .progress-inner strong {
+    color: #ef7c66;
+  }
+
+  .progress-track {
+    --progress: 0%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--red) var(--progress), #4a4a42 0);
+  }
+
+  .progress-inner button {
+    border: 0;
+    color: #aaa99d;
+    background: transparent;
+    font: .65rem/1 var(--mono);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .chapters {
+    padding-block: 8rem;
+  }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: end;
+    gap: 3rem;
+    margin-bottom: 4rem;
+  }
+
+  .section-head h2 {
+    margin: 0;
+    font: 740 clamp(2.7rem, 6vw, 5.5rem)/1.02 var(--serif);
+    letter-spacing: -.045em;
+  }
+
+  .section-head > p:last-child {
+    margin: 0;
+    color: var(--muted);
+    font-size: .9rem;
+  }
+
+  .chapter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--ink);
+  }
+
+  .chapter-card {
+    position: relative;
+    display: grid;
+    min-height: 320px;
+    grid-template-columns: auto 1fr;
+    gap: 2rem;
+    padding: 2rem;
+    overflow: hidden;
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    text-decoration: none;
+    transition: color .2s ease, background .2s ease;
+  }
+
+  .chapter-card::after {
+    position: absolute;
+    right: -1rem;
+    bottom: -4rem;
+    color: var(--ink);
+    content: "↗";
+    font: 300 12rem/1 var(--serif);
+    opacity: .05;
+  }
+
+  .chapter-card:hover {
+    color: var(--paper);
+    background: var(--ink);
+  }
+
+  .card-index {
+    color: var(--red);
+    font: 750 4rem/1 var(--serif);
+  }
+
+  .chapter-card > div {
+    align-self: end;
+  }
+
+  .chapter-card p,
+  .chapter-card span:last-child {
+    font: .65rem/1 var(--mono);
+    letter-spacing: .08em;
+  }
+
+  .chapter-card h3 {
+    margin: .7rem 0 3rem;
+    font: 720 clamp(2rem, 4vw, 4.4rem)/1 var(--serif);
+  }
+
+  .thesis {
+    padding: 8rem 0;
+    color: var(--paper);
+    background: var(--red);
+  }
+
+  .thesis-grid {
+    display: grid;
+    grid-template-columns: .35fr 1.3fr 1fr;
+    gap: 4rem;
+  }
+
+  .thesis-number {
+    margin: 0;
+    color: var(--ink);
+    font: 800 6rem/1 var(--serif);
+    opacity: .25;
+  }
+
+  .thesis .eyebrow {
+    color: var(--paper);
+  }
+
+  .thesis h2 {
+    margin: 0;
+    font: 750 clamp(3rem, 6vw, 6rem)/1 var(--serif);
+    letter-spacing: -.05em;
+  }
+
+  .thesis-copy {
+    align-self: end;
+  }
+
+  .thesis-copy p {
+    font-family: var(--serif);
+    font-size: 1.12rem;
+  }
+
+  .thesis-copy a {
+    color: var(--paper);
+    font: 700 .72rem/1 var(--mono);
+  }
+
+  .workflow {
+    padding-block: 8rem;
+  }
+
+  .workflow h2 {
+    margin: 0 0 3rem;
+    font: 730 clamp(2.5rem, 5vw, 4.5rem)/1 var(--serif);
+  }
+
+  .workflow ol {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--ink);
+    list-style: none;
+  }
+
+  .workflow li {
+    display: grid;
+    min-height: 190px;
+    align-content: space-between;
+    padding: 1.2rem;
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .workflow li span,
+  .workflow li small {
+    font: .63rem/1 var(--mono);
+  }
+
+  .workflow li span {
+    color: var(--red);
+  }
+
+  .workflow li strong {
+    font: 680 1.35rem/1.2 var(--serif);
+  }
+
+  .workflow li small {
+    color: var(--muted);
+  }
+
+  .closing {
+    padding: 6rem;
+    border: 1px solid var(--ink);
+    text-align: center;
+  }
+
+  .closing p {
+    font: .72rem/1 var(--mono);
+  }
+
+  .closing h2 {
+    margin: 1rem 0 2.5rem;
+    font: 740 clamp(2.6rem, 6vw, 5.5rem)/1.08 var(--serif);
+  }
+
+  @media (max-width: 980px) {
+    .hero {
+      min-height: 680px;
+    }
+
+    .hero-rail {
+      position: static;
+      width: auto;
+      max-width: 500px;
+      margin: 3rem 1.5rem;
+    }
+
+    .hero-seal {
+      right: 4%;
+      bottom: 3%;
+    }
+
+    .section-head,
+    .thesis-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .section-head .eyebrow,
+    .thesis-number {
+      display: none;
+    }
+
+    .workflow ol {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 680px) {
+    .hero {
+      min-height: 690px;
+      padding-top: 1.5rem;
+      border: 0;
+    }
+
+    .hero h1 {
+      font-size: clamp(4.5rem, 24vw, 7.5rem);
+    }
+
+    .hero h1 span {
+      margin-left: 0;
+    }
+
+    .hero-seal {
+      width: 100px;
+      height: 100px;
+    }
+
+    .hero-manifesto {
+      display: none;
+    }
+
+    .progress-inner {
+      grid-template-columns: 1fr auto;
+      padding-block: 1rem;
+    }
+
+    .progress-track {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+
+    .chapter-grid,
+    .workflow ol {
+      grid-template-columns: 1fr;
+    }
+
+    .chapter-card {
+      min-height: 230px;
+    }
+
+    .workflow li {
+      min-height: 130px;
+    }
+
+    .closing {
+      padding: 3rem 1rem;
+    }
+  }
+</style>

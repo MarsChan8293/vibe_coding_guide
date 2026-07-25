@@ -1,0 +1,99 @@
+---
+title: "07｜让计划可以逐步验收"
+description: "把“做一个作品集”拆成有依赖、有证据的小任务，并把项目规则留在仓库中。"
+section: practice
+order: 7
+estimatedMinutes: 18
+prerequisites: ["BRIEF.md 与 CONTENT.md 已提交"]
+outcomes:
+  - "生成并审查项目实施计划"
+  - "为每步定义可观察的完成证据"
+  - "创建不会随对话消失的项目规则"
+tags: ["计划", "任务拆解", "AGENTS.md"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["Agentic Coding 常用任务拆解实践"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+“做完整网站”太大。Agent 可能在一次会话里同时决定技术、内容、视觉和部署，任何一步偏离都难以定位。
+
+## 请求一份计划，而不是代码
+
+```text
+阅读 README.md、BRIEF.md 和 CONTENT.md。
+现在不要修改任何文件。
+
+请给出一个 6–8 步实施计划，每一步必须包含：
+- 目标；
+- 预计修改的文件；
+- 依赖的前一步；
+- 可运行或可观察的验收证据；
+- 主要风险。
+
+约束：Astro 静态站、无外部 CDN、首版不加博客和后端。
+```
+
+计划至少应覆盖：
+
+1. 初始化 Astro 与基础构建；
+2. 建立设计变量和语义结构；
+3. 写入真实内容；
+4. 实现响应式布局；
+5. 检查无障碍；
+6. 构建与浏览器验证；
+7. 配置 GitHub Pages。
+
+## 检查计划是否真的可执行
+
+删掉或改写这些步骤：
+
+- “优化用户体验”——没有说明观察什么；
+- “完善所有页面”——范围过大；
+- “确保没有 Bug”——无法证明；
+- “必要时重构”——给 Agent 无限范围；
+- 同一步同时初始化、设计、部署。
+
+<Callout type="note" title="好的步骤能单独失败">
+  如果一步失败，你应该能知道是内容、样式、构建还是部署问题。无法单独验证的步骤通常还不够小。
+</Callout>
+
+## 创建项目规则
+
+把稳定约束写入 `AGENTS.md`：
+
+```markdown
+# Project rules
+
+- 先阅读 BRIEF.md 和 CONTENT.md。
+- 不得虚构个人经历、客户或项目数据。
+- 不引入外部运行时 CDN、分析脚本或后端服务。
+- 每次只完成计划中的一个步骤。
+- 修改后运行 npm run build。
+- 不自动执行 git commit、git push 或删除命令。
+- 汇报修改文件、验证结果和剩余风险。
+```
+
+项目规则不是一份巨大的提示词。只放所有任务都应遵守、违反后会造成明显损失的规则。
+
+## 保存计划
+
+让 Agent 把确认后的计划写入 `PLAN.md`，然后检查并提交：
+
+```bash
+git add AGENTS.md PLAN.md
+git commit -m "Define implementation plan and agent rules"
+```
+
+<Checklist
+  id="practice-plan"
+  items={[
+    "计划包含 6–8 个有顺序的小步骤",
+    "每一步都有文件范围和验收证据",
+    "模糊、无限范围的步骤已被改写",
+    "AGENTS.md 只包含稳定规则",
+    "计划和规则已提交到 Git"
+  ]}
+/>

@@ -1,0 +1,86 @@
+---
+title: "01｜确认你的 Linux 起点"
+description: "不安装任何东西，先确认发行版、Shell、网络、权限和企业模型信息是否齐全。"
+section: practice
+order: 1
+estimatedMinutes: 12
+prerequisites: ["企业提供一台可使用终端的 Linux 电脑"]
+outcomes:
+  - "收集后续安装所需的环境事实"
+  - "识别自己是否拥有必要权限"
+  - "向管理员一次性索取正确的模型接入信息"
+tags: ["Linux", "Ubuntu", "openEuler"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["Ubuntu", "openEuler", "bash 常用命令"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+打开终端，先不要安装软件。我们要建立一份环境小档案，避免把 Ubuntu 命令复制到 openEuler，或者在没有管理员权限时反复尝试。
+
+## 确认系统与 Shell
+
+```bash
+cat /etc/os-release
+printf 'shell=%s\n' "$SHELL"
+uname -m
+```
+
+记录以下信息：
+
+- `ID` 与 `VERSION_ID`：发行版和版本；
+- Shell 是否为 `/bin/bash`；
+- 架构是 `x86_64` 还是 `aarch64`。
+
+本教程正文以 Ubuntu + bash 为主。openEuler 通常使用 `dnf` 管理软件包；如果管理员提供的是定制镜像，以企业内部文档优先。
+
+## 检查已有工具
+
+```bash
+for command in git node npm curl opencode; do
+  if command -v "$command" >/dev/null 2>&1; then
+    printf '%-10s %s\n' "$command" "$(command -v "$command")"
+  else
+    printf '%-10s %s\n' "$command" "未安装"
+  fi
+done
+```
+
+这条命令只检查路径，不会修改电脑。把结果保存到自己的笔记中，不要连同用户名、主机名或内部地址发到公共聊天。
+
+## 确认安装权限
+
+```bash
+sudo -n true 2>/dev/null && echo "sudo 可用" || echo "sudo 需要审批或不可用"
+```
+
+“需要密码”不代表你应该尝试猜测或绕过。企业电脑没有 sudo 很正常，管理员可能通过软件中心、模块系统或内部安装包提供工具。
+
+<Callout type="enterprise" title="向管理员索取五项信息">
+  模型 Base URL、模型 ID、API Key 获取方式、是否需要代理或企业 CA 证书、接口采用 `/v1/chat/completions` 还是 `/v1/responses`。不要要求管理员把真实密钥发进群聊。
+</Callout>
+
+## 建立安全工作目录
+
+后续实践只在你明确创建的目录内进行：
+
+```bash
+mkdir -p "$HOME/workspace"
+cd "$HOME/workspace"
+pwd
+```
+
+确认输出以你的用户目录开头。不要在 `/`、系统配置目录或共享生产目录里启动 Agent。
+
+<Checklist
+  id="practice-linux"
+  items={[
+    "我知道自己的发行版、版本、架构和 Shell",
+    "我检查了 Git、Node、npm、curl 和 OpenCode 是否已安装",
+    "我知道自己是否有 sudo 或需要联系管理员",
+    "我已拿到或申请模型接入所需的五项信息",
+    "我创建了专用 workspace 目录"
+  ]}
+/>

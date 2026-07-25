@@ -1,0 +1,81 @@
+---
+title: "03｜安装并验证 OpenCode"
+description: "从官方渠道安装 OpenCode，确认二进制路径和版本，并为企业环境准备最小安全设置。"
+section: practice
+order: 3
+estimatedMinutes: 14
+prerequisites: ["Git、Node.js、npm 可用", "拥有安装软件的许可"]
+outcomes:
+  - "从批准渠道完成 OpenCode 安装"
+  - "确认实际执行的是预期二进制"
+  - "知道无外网环境该如何处理"
+tags: ["OpenCode", "安装", "供应链"]
+reviewedAt: "2026-07-25"
+reviewedAgainst: ["https://opencode.ai/docs/"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+安装 Agent 等于在电脑上加入一个能读取文件和执行命令的程序。来源必须比“能不能装上”更重要。
+
+## 选择安装渠道
+
+如果企业已有内部软件仓库或安装脚本，使用企业渠道。个人可控环境可以按照 OpenCode 官方文档使用安装脚本：
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+```
+
+重新打开终端，或按安装输出提示更新 `PATH`。然后验证：
+
+```bash
+command -v opencode
+opencode --version
+```
+
+`command -v` 应指向你的用户目录或管理员指定路径，而不是临时下载目录。
+
+<Callout type="warning" title="不要盲目执行 curl | bash">
+  在企业环境中，先确认域名、代理、证书和安装政策。官方命令只是个人环境的便捷路径，不会覆盖组织的供应链要求。
+</Callout>
+
+## 无外网或代理环境
+
+不要关闭证书校验来“解决”下载失败。正确做法是：
+
+1. 向管理员确认代理变量和企业 CA；
+2. 使用内部镜像或离线安装包；
+3. 核对包的版本、来源和校验值；
+4. 将安装步骤记录到团队文档。
+
+常见代理变量由管理员提供：
+
+```bash
+env | grep -Ei '^(http|https|no)_proxy='
+```
+
+这条命令可能显示内部地址，只在自己的终端检查，不要把输出贴到公共 Issue。
+
+## 第一次启动前
+
+回到练习仓库：
+
+```bash
+cd "$HOME/workspace/vibe-portfolio"
+git status
+```
+
+确认工作区干净。下一课才会配置模型 API；现在启动后如果要求选择 Provider，可以先退出，不要随便粘贴真实 Key。
+
+<Checklist
+  id="practice-install-opencode"
+  items={[
+    "安装来源符合企业政策",
+    "command -v opencode 指向预期路径",
+    "opencode --version 能正常输出",
+    "我没有关闭 TLS 校验或使用不明镜像",
+    "练习仓库仍保持干净"
+  ]}
+/>

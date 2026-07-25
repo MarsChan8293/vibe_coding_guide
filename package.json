@@ -1,0 +1,28 @@
+{
+  "name": "vibe-coding-guide",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build && pagefind --site dist && node scripts/check-built-site.mjs",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
+    "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+    "test:content": "node scripts/validate-content.mjs",
+    "test": "npm run test:content && npm run check && npm run build",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "latest",
+    "@fontsource-variable/jetbrains-mono": "latest",
+    "@fontsource-variable/noto-sans-sc": "latest",
+    "@fontsource-variable/noto-serif-sc": "latest",
+    "astro": "latest"
+  },
+  "devDependencies": {
+    "@astrojs/check": "latest",
+    "@playwright/test": "latest",
+    "pagefind": "latest",
+    "typescript": "latest"
+  }
+}

@@ -1,0 +1,140 @@
+---
+title: "11｜发布到 GitHub Pages"
+description: "创建 GitHub 仓库、配置 Astro 子路径与官方 Actions 工作流，并完成一次真实的线上验收。"
+section: practice
+order: 11
+estimatedMinutes: 28
+prerequisites: ["发布前检查全部通过", "拥有 GitHub 账号"]
+outcomes:
+  - "把本地项目安全推送到 GitHub"
+  - "配置 Astro 项目站点子路径"
+  - "完成 GitHub Pages 线上验收"
+tags: ["GitHub Pages", "Actions", "部署"]
+reviewedAt: "2026-07-25"
+reviewedAgainst:
+  - "https://docs.astro.build/en/guides/deploy/github/"
+  - "https://docs.github.com/en/pages"
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+最后一步会改变外部状态：代码进入公开仓库，页面可以被任何人访问。推送前再检查一次仓库中没有密钥、内部地址和不应公开的素材。
+
+## 创建 GitHub 仓库
+
+在 GitHub 创建一个公开空仓库，例如 `my-portfolio`。不要勾选自动创建 README，因为本地已经有完整历史。
+
+连接远端：
+
+```bash
+git remote add origin git@github.com:<GITHUB_USER>/<REPOSITORY_NAME>.git
+git remote -v
+git push -u origin main
+```
+
+把占位符替换为实际用户与仓库名。SSH 未配置时，按 GitHub 官方文档完成认证，不要把 Token 直接写进远端 URL。
+
+## 配置 Astro 子路径
+
+项目站点的地址通常是：
+
+```text
+https://<GITHUB_USER>.github.io/<REPOSITORY_NAME>/
+```
+
+在 `astro.config.mjs` 中：
+
+```js
+import { defineConfig } from "astro/config";
+
+export default defineConfig({
+  site: "https://<GITHUB_USER>.github.io",
+  base: "/<REPOSITORY_NAME>"
+});
+```
+
+内部链接和静态资源应使用 Astro 的 Base URL 或相对路径，不能假设网站部署在域名根目录。
+
+## 添加官方 Pages 工作流
+
+创建 `.github/workflows/deploy.yml`：
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: withastro/action@v3
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+在仓库 Settings → Pages 中，将 Source 设为 GitHub Actions。
+
+<Callout type="warning" title="Secrets 不属于静态站">
+  GitHub Pages 的 HTML、CSS 和 JavaScript 都会下载到访客浏览器。任何打包进前端的 API Key 都等于公开。作品集不应直接调用企业模型 API。
+</Callout>
+
+## 触发部署
+
+```bash
+git add astro.config.mjs .github/workflows/deploy.yml
+git commit -m "Configure GitHub Pages deployment"
+git push
+```
+
+在 Actions 页面等待工作流完成。失败时先点开第一条红色步骤，阅读明确错误。
+
+## 线上验收
+
+不要只确认首页“能打开”：
+
+1. 用无痕窗口打开生产 URL；
+2. 刷新一个深层页面；
+3. 检查字体、图片与 CSS；
+4. 在手机或窄窗口浏览；
+5. 点击全部项目与联系方式；
+6. 查看浏览器控制台；
+7. 把生产 URL 写回 README。
+
+<Checklist
+  id="practice-pages"
+  items={[
+    "公开仓库不包含密钥或企业内部信息",
+    "Astro site 与 base 匹配 GitHub 用户和仓库名",
+    "Pages Source 已设置为 GitHub Actions",
+    "部署工作流成功完成",
+    "无痕窗口与移动端完成线上验收",
+    "生产 URL 已写入 README"
+  ]}
+/>
+
+> 你已经完成了从需求、计划、实现、验证到发布的完整闭环。下一章不会再增加工具，而是把这次成功提炼成可重复的方法。

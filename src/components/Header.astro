@@ -1,0 +1,189 @@
+---
+import { BASE } from "../lib/site";
+
+const nav = [
+  { href: `${BASE}history/`, label: "历史" },
+  { href: `${BASE}tools/map/`, label: "工具" },
+  { href: `${BASE}practice/linux-baseline/`, label: "实践" },
+  { href: `${BASE}methods/context/`, label: "方法" }
+];
+---
+
+<header class="masthead">
+  <div class="site-shell masthead-inner">
+    <a class="brand" href={BASE} aria-label="返回首页">
+      <span class="brand-mark">VC</span>
+      <span class="brand-name">从感觉到工程</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+
+    <div class="masthead-tools">
+      <a class="search-link" href={`${BASE}search/`}>
+        <span aria-hidden="true">⌕</span>
+        <span>搜索</span>
+      </a>
+      <span class="mini-progress" aria-label="课程完成进度">
+        <span data-progress-count>0/24</span>
+      </span>
+      <details class="mobile-menu">
+        <summary aria-label="打开导航">目录</summary>
+        <nav aria-label="移动端导航">
+          {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+          <a href={`${BASE}start/`}>从这里开始</a>
+          <a href={`${BASE}glossary/`}>术语表</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+<style>
+  .masthead {
+    position: sticky;
+    z-index: 50;
+    top: 0;
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--paper) 91%, transparent);
+    backdrop-filter: blur(14px);
+  }
+
+  .masthead-inner {
+    display: grid;
+    min-height: 72px;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    width: max-content;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .brand-mark {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    color: var(--paper);
+    background: var(--red);
+    font: 800 .78rem/1 var(--mono);
+    transform: rotate(-4deg);
+  }
+
+  .brand-name {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+  }
+
+  .desktop-nav {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .desktop-nav a {
+    position: relative;
+    font: 700 .78rem/1 var(--mono);
+    text-decoration: none;
+  }
+
+  .desktop-nav a::after {
+    position: absolute;
+    right: 50%;
+    bottom: -.65rem;
+    left: 50%;
+    height: 2px;
+    content: "";
+    background: var(--red);
+    transition: right .18s ease, left .18s ease;
+  }
+
+  .desktop-nav a:hover::after {
+    right: 0;
+    left: 0;
+  }
+
+  .masthead-tools {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  .search-link {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    font: 650 .75rem/1 var(--mono);
+    text-decoration: none;
+  }
+
+  .search-link > span:first-child {
+    font-size: 1.5rem;
+  }
+
+  .mini-progress {
+    padding: .35rem .55rem;
+    border: 1px solid var(--line);
+    font: 600 .67rem/1 var(--mono);
+  }
+
+  .mobile-menu {
+    display: none;
+    position: relative;
+  }
+
+  .mobile-menu summary {
+    cursor: pointer;
+    font: 700 .74rem/1 var(--mono);
+    list-style: none;
+  }
+
+  .mobile-menu nav {
+    position: absolute;
+    top: 2.3rem;
+    right: 0;
+    display: grid;
+    width: 190px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    box-shadow: 7px 7px 0 var(--red);
+  }
+
+  .mobile-menu a {
+    padding: .75rem 1rem;
+    border-bottom: 1px solid var(--line);
+    font: 700 .78rem/1.2 var(--mono);
+    text-decoration: none;
+  }
+
+  @media (max-width: 820px) {
+    .masthead-inner {
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+    }
+
+    .desktop-nav,
+    .mini-progress {
+      display: none;
+    }
+
+    .mobile-menu {
+      display: block;
+    }
+  }
+
+  @media (max-width: 460px) {
+    .brand-name,
+    .search-link span:last-child {
+      display: none;
+    }
+  }
+</style>
