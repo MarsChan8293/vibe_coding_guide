@@ -1,23 +1,61 @@
 ---
 title: "终端 Agent：把工程命令变成协作语言"
-description: "比较 OpenCode、Claude Code、Codex CLI、Gemini CLI 的共同工作方式，并建立不依赖品牌的使用原则。"
+description: "比较 OpenCode、Claude Code、Codex CLI 与 Kimi Code CLI，理解四种终端 Agent 路线及其中国使用边界。"
 section: tools
-order: 4
-estimatedMinutes: 11
-prerequisites: ["完成 OpenCode 介绍"]
+order: 3
+estimatedMinutes: 18
+prerequisites: ["理解模型、Agent、Skill 三层"]
 outcomes:
   - "理解终端 Agent 的共享工作循环"
-  - "知道 Harness 和模型能力必须一起评估"
-  - "用仓库验证命令约束 Agent"
-tags: ["CLI", "Claude Code", "Codex", "Gemini CLI"]
-reviewedAt: "2026-07-25"
-reviewedAgainst: ["各工具官方文档"]
+  - "比较四款代表性终端 Agent 的产品边界"
+  - "按模型来源、网络、账号和权限选择工具"
+  - "用仓库验证命令约束任何终端 Agent"
+tags: ["CLI", "OpenCode", "Claude Code", "Codex CLI", "Kimi Code CLI"]
+reviewedAt: "2026-07-26"
+reviewedAgainst: ["OpenCode 官方文档", "Claude Code 官方文档", "Codex CLI 官方文档", "Kimi Code 官方文档"]
 draft: false
 ---
 
 import Callout from "../../../components/Callout.astro";
 
-OpenCode、Claude Code、Codex CLI 和 Gemini CLI 的产品细节不同，但都围绕同一件事：让模型在终端里调用文件、搜索、Shell 和编辑工具，形成一个 Agent 循环。
+OpenCode、Claude Code、Codex CLI 和 Kimi Code CLI 的产品细节不同，但都围绕同一件事：让模型在终端里读取仓库、编辑文件、运行 Shell 命令，并根据结果继续行动。
+
+本课选择的是四种**在全球或中国开发者中具有代表性的产品路线**，不是使用率排名。终端 Agent 缺少口径一致的中国市场调查，因此不使用 GitHub Stars、厂商注册量或社交媒体热度拼出一张虚假的榜单。
+
+## 四款工具怎样不同
+
+| 工具 | 产品路线 | 主要优势 | 主要约束 | 更适合 |
+| --- | --- | --- | --- | --- |
+| **OpenCode** | 开源 Harness + 可配置 Provider | 支持多种模型 Provider，适合 OpenAI-compatible 企业网关；终端过程可观察 | 效果取决于所接模型、配置与权限，企业要自行维护组合 | 需要替换模型、连接企业 API、坚持开源工具链的 Linux 团队 |
+| **Claude Code** | Anthropic 的 Agentic Coding 产品 | 代码库理解、文件与命令工具、验证循环，以及 Skills、Hooks、MCP 等扩展体系 | 账号、支持地区、模型服务与企业数据条款必须先批准 | 已获准使用 Anthropic 服务，希望处理复杂跨文件任务的团队 |
+| **Codex CLI** | OpenAI 的本地终端 Coding Agent | 在本地仓库中检查、编辑和运行代码；可控制模型、推理强度、权限，并支持脚本与 CI | 需要可用的 OpenAI/ChatGPT 账号路径与组织策略；不是任意 Provider 前端 | 已使用 OpenAI 体系，需要交互式开发、审查与自动化的团队 |
+| **Kimi Code CLI** | Moonshot 的终端 Agent + Kimi Code 服务 | 面向中文开发者，支持读取和修改代码、运行命令、搜索文件，也可与 IDE 配合 | 需要核对会员权益、模型版本、额度、企业数据和服务条款 | 中国网络环境、中文交互和 Kimi 模型生态优先的个人或团队 |
+
+### OpenCode
+
+[OpenCode](https://opencode.ai/docs/)是开源终端 Agent。它最重要的特点不是绑定某个“最强模型”，而是把 Agent Harness 与模型 Provider 分开：团队可以连接不同厂商、本地模型或企业 OpenAI-compatible 网关。
+
+这也是本教程选择它作为实践主线的原因。课程环境已经提供企业兼容 API，读者可以在不更换任务方法的前提下替换模型。不过，可配置不等于自动安全；Provider、日志、网络和权限仍由团队负责。
+
+### Claude Code
+
+[Claude Code 官方文档](https://code.claude.com/docs/en/overview)把它定义为可以读取代码库、编辑文件、运行命令并集成开发工具的 Agentic Coding 工具。终端是其完整能力入口，同时还覆盖 IDE、桌面和 Web 等形态。
+
+它适合长链路、跨文件的软件工程任务，但不能只比较模型效果。还要检查 Anthropic 支持地区、登录和计费方式、组织管理、代码数据处理，以及命令权限是否符合企业要求。
+
+### Codex CLI
+
+[Codex CLI 官方文档](https://developers.openai.com/codex/cli/)将其定位为在终端中检查、编辑和运行代码的本地 Agent。用户可以选择模型、推理强度、权限与命令，也能通过 `codex exec` 接入脚本和 CI。
+
+课程统一使用正式名称 **Codex CLI**，不写成 “CodeX”。它适合已经批准 OpenAI 或 ChatGPT 工作区的团队；如果企业只提供一个通用 OpenAI-compatible Base URL，不能先假定它与 Codex CLI 的账号、模型和功能完全兼容。
+
+### Kimi Code CLI
+
+[Kimi Code 官方文档](https://www.kimi.com/code/docs/)说明，Kimi Code 通过 CLI 和 VS Code 扩展提供代码阅读、文件编辑与命令执行能力。CLI 会在终端中根据工具反馈规划下一步，属于完整 Agent，而不只是问答命令。
+
+它为中国开发者提供了更直接的中文产品与账号路径，但“国内服务”同样需要审计：个人会员权益不等于企业授权，模型版本、额度、数据用途和组织控制都要逐项确认。
+
+后续工具章节会把通用能力单独展开：先学习 [Agent 与 Subagent](/vibe_coding_guide/tools/agent-subagents/) 的任务编排和上下文隔离，再学习 [MCP](/vibe_coding_guide/tools/mcp/) 的工具连接边界，最后学习 [Skill](/vibe_coding_guide/tools/agent-skills/) 如何沉淀可复用方法。它们不再混在本页的产品比较中。
 
 ## 真正可迁移的能力
 
@@ -45,6 +83,29 @@ Agent Harness 会决定：
 
 因此“模型 A 在工具 X 里很好用”不能直接推出它在工具 Y 里表现相同。
 
+## 中国环境先过四道门
+
+| 门槛 | 必须确认 |
+| --- | --- |
+| 网络 | 官网、登录、模型 API、更新源和依赖下载是否稳定且被企业允许 |
+| 账号 | 使用个人订阅、企业工作区、API Key，还是内部统一身份 |
+| 数据 | 代码、Prompt、索引、命令输出和遥测发送到哪里、保留多久 |
+| 权限 | 能否限制读取范围、命令、网络、MCP、提交、推送与部署 |
+
+能正常安装只代表二进制可以运行，不代表模型服务可达，更不代表企业已经批准。反过来，国内账号和中文界面也不能自动替代数据分类、合同与审计。
+
+## 按场景选择第一款
+
+| 场景 | 优先评估 |
+| --- | --- |
+| 企业已有 OpenAI-compatible 模型网关，需要自由换模型 | OpenCode |
+| Anthropic 服务、账号与数据条款已经批准 | Claude Code |
+| OpenAI / ChatGPT 工作区已经批准，并需要终端与自动化 | Codex CLI |
+| 中国网络与中文交互优先，团队已批准 Kimi Code | Kimi Code CLI |
+| 以上服务都未获企业批准 | 暂不安装，先完成 Provider 与数据边界确认 |
+
+这不是永久选型。用同一仓库、同一模型层级、同一任务和同一验收标准做试点，记录任务完成率、人工纠正次数、命令风险与总成本，再决定是否扩大使用。
+
 ## 终端的优势也是风险
 
 终端拥有项目最真实的反馈：命令成功或失败、测试通过或失败、文件是否存在。但终端也能访问凭证、网络和系统资源。
@@ -67,3 +128,7 @@ Agent Harness 会决定：
 ```
 
 当工具换掉时，这种任务描述仍然有效。
+
+<Callout type="note" title="介绍四款，实践只走一条线">
+  后续实践统一使用 OpenCode，不要求同时安装 Claude Code、Codex CLI 和 Kimi Code CLI。这里的目标是会选、会审计、会迁移方法，而不是收集工具。
+</Callout>

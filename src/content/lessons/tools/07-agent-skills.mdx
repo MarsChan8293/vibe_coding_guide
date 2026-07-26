@@ -2,15 +2,15 @@
 title: "Skill：把一次有效协作变成能力"
 description: "理解 SKILL.md、渐进加载与作用域：Skill 不是一段更长的 Prompt，而是一套可复用、可审计的工作方法。"
 section: tools
-order: 6
+order: 7
 estimatedMinutes: 12
-prerequisites: ["了解终端型 Coding Agent", "完成第一次安全会话"]
+prerequisites: ["理解 Agent 与 Subagent", "理解 MCP 的工具连接边界"]
 outcomes:
-  - "说清 Skill、MCP、仓库指令与脚本分别解决什么问题"
+  - "判断一段经验是否值得封装成 Skill"
   - "理解 OpenCode 如何发现并按需加载 SKILL.md"
   - "为团队 Skill 选择项目级或个人级作用域"
 tags: ["Agent Skills", "SKILL.md", "OpenCode"]
-reviewedAt: "2026-07-25"
+reviewedAt: "2026-07-26"
 reviewedAgainst: ["Agent Skills 开放规范", "OpenCode Agent Skills 官方文档", "GitHub Agent Skills 官方文档"]
 draft: false
 ---
@@ -30,20 +30,13 @@ github-pages-release-check/
 └── assets/           # 可选：模板、图标、样例文件
 ```
 
-## 它和 MCP、AGENTS.md、脚本有什么不同？
-
-| 东西 | 主要解决 | 最适合放什么 | 不负责什么 |
-| --- | --- | --- | --- |
-| Skill | “这类任务怎样可靠地完成？” | 触发条件、步骤、边界、验证、参考资料 | 提供一个外部工具本身 |
-| MCP | “Agent 能连到什么工具或数据？” | 数据库、浏览器、工单系统、文件服务的连接能力 | 告诉 Agent 每一步该怎样做 |
-| `AGENTS.md` / 仓库指令 | “在这个仓库里总要遵守什么？” | 技术栈、命令、目录约定、全局规则 | 只在特定任务触发的复杂流程 |
-| 脚本 | “这一步怎样确定性地执行？” | 格式化、检查、转换等固定操作 | 判断什么时候该运行、如何解释结果 |
-
-可以把它们组合：**MCP 给手，Skill 给方法，仓库指令给常驻背景，脚本给确定性。** 这是一种职责划分，不是产品等级。
+## 什么内容值得做成 Skill
 
 <Callout type="tip" title="先别把所有知识都塞进 Skill">
-  每次都相关的十行编码规范，放仓库指令；一次性的回答，留在对话；只有“会反复出现、包含判断与验证步骤”的任务，才值得做成 Skill。
+  每次都相关的短规则，放仓库指令；一次性的回答，留在对话；固定且不需要判断的操作，优先写成脚本。只有“会反复出现、包含判断与验证步骤”的任务，才值得做成 Skill。
 </Callout>
+
+适合封装的例子包括发布前检查、代码审查、故障诊断和固定格式的研究报告。一个 Skill 可以调用脚本，也可以使用 Agent 已有的工具，但它的核心仍是可复用的工作方法。
 
 ## OpenCode 会在哪里找？
 
@@ -82,7 +75,7 @@ OpenCode 也会识别项目内的 `.claude/skills/`、`.agents/skills/`，以及
 <Checklist
   id="tools-agent-skills"
   items={[
-    "我能区分 Skill 提供的方法与 MCP 提供的连接能力",
+    "我只把反复出现且包含判断与验证的流程做成 Skill",
     "我知道项目级 Skill 应放在 .opencode/skills/<名称>/SKILL.md",
     "我会先用只读、低风险任务验证一个新 Skill",
     "我不会把 API Key、客户数据或高权限默认授权写进 Skill"

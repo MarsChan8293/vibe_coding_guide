@@ -16,7 +16,7 @@ const requiredFields = [
   "reviewedAgainst",
   "draft",
 ];
-const expected = { history: 1, tools: 7, practice: 10, methods: 8 };
+const expected = { history: 1, tools: 8, practice: 9, methods: 8 };
 const errors = [];
 
 async function walk(directory) {

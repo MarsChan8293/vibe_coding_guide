@@ -65,20 +65,16 @@ git config --global --list
   公开仓库可以使用 GitHub 提供的 noreply 邮箱。不要为了跟教程一致而公开企业内部邮箱。
 </Callout>
 
-## 创建最小仓库
+## 进入当前教程仓库
 
 ```bash
 cd "$HOME/workspace"
-mkdir vibe-portfolio
-cd vibe-portfolio
-git init
-printf '# 我的作品集\n' > README.md
-git add README.md
-git commit -m "Initialize portfolio project"
+git clone https://github.com/MarsChan8293/vibe_coding_guide.git
+cd vibe_coding_guide
 git status
 ```
 
-最后应该看到工作区干净。这个提交是你的第一个安全锚点：后续 Agent 修改异常时，可以查看差异或回到这里。
+如果仓库已经存在，直接进入它即可，不要重复克隆。最后应该看到工作区干净；这就是当前项目的第一个安全基线，后续 Agent 修改异常时，可以查看差异或回到最近一次确认的提交。
 
 ## 先记住三个 Git 命令
 
@@ -95,8 +91,7 @@ git log --oneline --decorate -5
   items={[
     "Git、Node.js 与 npm 都能输出版本",
     "Git 姓名和邮箱配置正确",
-    "vibe-portfolio 仓库已创建",
-    "README 的初始提交成功",
+    "当前教程仓库已克隆或进入",
     "git status 显示工作区干净"
   ]}
 />

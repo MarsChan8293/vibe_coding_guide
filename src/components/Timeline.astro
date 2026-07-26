@@ -44,7 +44,7 @@ const { events } = Astro.props;
   {events.map((event, index) => (
     <li>
       {event.model && (
-      <details class="event-card model-card" open={index === 0 || index === events.length - 1}>
+      <details class="event-card model-card">
         <summary>
           <span class="track-kicker">模型发布</span>
           <strong>{event.model.title}</strong>

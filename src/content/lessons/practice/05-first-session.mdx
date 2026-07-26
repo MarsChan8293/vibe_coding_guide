@@ -1,17 +1,18 @@
 ---
 title: "完成第一次安全会话"
-description: "让 OpenCode 先观察、再计划、最后做一个可验证的小修改，建立正确的协作节奏。"
+description: "认识 Plan、文件引用与会话命令，让 OpenCode 先观察、再计划、最后做一个可验证的小修改。"
 section: practice
 order: 5
-estimatedMinutes: 18
+estimatedMinutes: 22
 prerequisites: ["企业 Provider 连接成功", "练习仓库工作区干净"]
 outcomes:
+  - "识别 OpenCode 的高频命令与输入语法"
   - "把目标、范围和验收标准写进任务"
   - "先使用只读探索，再授权修改"
   - "用 Git Diff 与命令结果验证交付"
-tags: ["首次会话", "安全", "Git Diff"]
-reviewedAt: "2026-07-25"
-reviewedAgainst: ["OpenCode 官方入门文档"]
+tags: ["首次会话", "Plan", "常用命令", "Git Diff"]
+reviewedAt: "2026-07-26"
+reviewedAgainst: ["OpenCode TUI 官方文档", "OpenCode Rules 官方文档"]
 draft: false
 ---
 
@@ -20,20 +21,43 @@ import Checklist from "../../../components/Checklist.astro";
 
 第一次会话不做完整网站。我们只让 Agent 改进 README，并观察从指令到证据的整个过程。
 
+## 先认识高频命令与输入语法
+
+OpenCode 的斜杠命令用于控制会话；`@` 和 `!` 则把文件或命令结果带进当前上下文。先记住下面这些，不需要一次全部使用：
+
+| 输入 | 作用 | 什么时候用 |
+| --- | --- | --- |
+| `Tab` 切到 **Plan** | 切换到只读规划 Agent | 大改动前先探索、比较方案，不授权编辑 |
+| `/init` | 扫描仓库并创建或更新 `AGENTS.md` | 建立项目长期规则；下一课再实际执行 |
+| `@README.md` | 精确引用文件并加入当前上下文 | 明确告诉 Agent 应重点阅读什么 |
+| `!git status` | 直接运行 Shell，并把输出加入会话 | 快速提供仓库状态、测试或诊断证据 |
+| `/compact` | 总结当前长会话，释放上下文空间 | 任务仍要继续，但对话已经很长 |
+| `/new` | 开始一个空白新会话；别名是 `/clear` | 当前任务已经结束，要切换到新目标 |
+| `/sessions` | 查看并恢复旧会话；别名是 `/resume` | 回到之前尚未结束的任务 |
+| `/models` | 查看和选择可用模型 | Provider 已连接，需要切换模型时 |
+| `/undo`、`/redo` | 撤销或重做最近一轮消息及文件改动 | Agent 改错且仓库处于 Git 管理下 |
+| `/help` | 打开当前版本的帮助 | 忘记命令或快捷键时 |
+
+<Callout type="note" title="Plan 不是斜杠命令">
+  OpenCode 内置的 Plan 与 Build 是两种主 Agent。默认用 `Tab` 切换；看到状态栏已显示 Plan 后，再开始只读探索。不同工具可能把类似能力叫作 Plan mode 或 `/plan`，不要把其他产品的命令直接照搬到 OpenCode。
+</Callout>
+
+命令和快捷键会随版本变化。使用前可在 `/help` 中确认，也可核对 [OpenCode TUI 官方文档](https://opencode.ai/docs/tui/)。
+
 ## 第一步：只读探索
 
 在仓库中启动 OpenCode：
 
 ```bash
-cd "$HOME/workspace/vibe-portfolio"
+cd "$HOME/workspace/vibe_coding_guide"
 opencode
 ```
 
-输入：
+按 `Tab` 切换到 **Plan**，然后输入：
 
 ```text
 先不要修改文件。
-请检查当前仓库结构和 Git 状态，然后说明：
+请检查当前仓库结构、@README.md 和 Git 状态，然后说明：
 1. 这个项目现在有什么；
 2. 下一步最小、可验证的改进是什么；
 3. 你准备读取和修改哪些文件。
@@ -41,12 +65,14 @@ opencode
 
 好的回复应该承认仓库几乎为空，并把范围限制在 README。若它声称看到了不存在的文件，先指出事实，不要继续授权。
 
+你也可以直接输入 `!git status`，把未经模型转述的 Git 输出加入会话。它适合补充证据，但不能替代你最后在独立终端中的人工核对。
+
 ## 第二步：给出完整任务
 
 ```text
-目标：把 README 改成个人作品集项目说明。
+目标：把 README 改成当前 Vibe Coding 教程项目说明。
 范围：只允许修改 README.md，不创建其他文件，不安装依赖。
-内容：项目目标、计划页面、技术约束、完成定义。
+内容：教程目标、课程结构、技术约束、完成定义。
 验收：
 1. Markdown 结构清晰；
 2. 不包含真实姓名、密钥或内部地址；
@@ -81,13 +107,22 @@ git diff -- README.md
 
 ```bash
 git add README.md
-git commit -m "Define portfolio project"
+git commit -m "Clarify tutorial project README"
 git status
 ```
 
 <Callout type="checkpoint" title="你刚完成了完整闭环">
   观察事实 → 写清任务 → 审查计划 → 授权修改 → 查看 Diff → 人工提交。后面的项目会更复杂，但循环不变。
 </Callout>
+
+## 任务结束后怎样处理会话
+
+- 任务还没结束、但上下文已经很长：使用 `/compact`；
+- README 任务已结束，准备开始无关任务：使用 `/new`；
+- 以后想回到这次会话：使用 `/sessions` 或 `/resume`；
+- Agent 最近一轮修改方向完全错误：先检查 `git diff`，再决定是否使用 `/undo`。
+
+不要把 `/compact` 当成新会话：它保留任务连续性，只压缩历史。也不要把 `/new` 当成删除记录：旧会话仍可从会话列表恢复。
 
 ## 如果 Agent 越界
 
@@ -96,6 +131,7 @@ git status
 <Checklist
   id="practice-first-session"
   items={[
+    "我能说出 Plan、/init、/compact、/new 和 @文件引用的作用",
     "Agent 在修改前先完成了只读探索",
     "任务包含目标、范围和验收标准",
     "计划得到人工确认后才执行",

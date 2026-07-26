@@ -1,0 +1,101 @@
+---
+title: "MCP：把外部工具与数据接入 Agent"
+description: "理解 MCP server、Tools、Resources 与连接边界，学会按最小权限审计本地和远程 MCP。"
+section: tools
+order: 6
+estimatedMinutes: 13
+prerequisites: ["理解 Agent 与 Subagent", "知道 Agent 会调用工具"]
+outcomes:
+  - "解释 MCP 在 Agent 工具链中的位置"
+  - "判断一个需求是否适合通过 MCP 接入"
+  - "理解本地和远程 MCP 的信任边界"
+  - "按来源、凭据、数据和权限审计 MCP"
+tags: ["MCP", "Model Context Protocol", "Tools", "企业安全"]
+reviewedAt: "2026-07-26"
+reviewedAgainst: ["OpenCode MCP 官方文档", "Claude Code MCP 官方文档", "Model Context Protocol 官方规范"]
+draft: false
+---
+
+import Callout from "../../../components/Callout.astro";
+import Checklist from "../../../components/Checklist.astro";
+
+Agent 默认只能使用产品内置的读文件、搜索、编辑和 Shell 等工具。**MCP（Model Context Protocol）**提供一套连接方式，让 Agent 能发现并使用外部系统提供的能力，例如查询 GitHub、读取内部文档、访问数据库或控制浏览器。
+
+```text
+用户目标
+  ↓
+Agent / Subagent
+  ├─ 内置工具：Read、Edit、Shell、Search
+  └─ MCP Client
+       ↓
+     MCP Server
+       ├─ 外部 Tools
+       ├─ Resources
+       └─ Prompts
+            ↓
+        GitHub / 数据库 / 文档 / 浏览器
+```
+
+MCP 解决“怎样让不同 Agent 连接外部能力”的接口问题，不替你决定业务流程，也不自动保证服务可信。
+
+## MCP server 可以提供什么
+
+| 能力 | 含义 | 例子 |
+| --- | --- | --- |
+| Tools | Agent 可以主动调用的操作 | 搜索 Issue、查询数据库、创建工单 |
+| Resources | 可以读取的结构化或文件型上下文 | 文档、Schema、仓库元数据 |
+| Prompts | Server 提供的可复用提示入口 | 诊断流程、查询模板 |
+
+具体 Agent 产品不一定以相同方式展示全部能力。OpenCode 文档重点呈现 MCP Tools；Claude Code 还提供 MCP 资源引用和连接管理。课程只要求理解协议角色，实际可用功能应以当前客户端与 Server 文档为准。
+
+## 本地与远程 MCP 是两种信任边界
+
+| 类型 | 运行位置 | 主要风险 |
+| --- | --- | --- |
+| 本地 MCP | 由本机命令启动 | 安装包与脚本供应链、本地文件和环境变量访问 |
+| 远程 MCP | 通过网络连接服务 | 账号授权、数据出境、服务端日志、可用性与撤销 |
+
+“本地运行”不等于低风险：恶意或维护失控的包仍可能读取凭据、文件和网络。“远程服务”也不等于不能使用，但必须明确由谁运营、发送哪些数据、凭据放在哪里以及如何撤销。
+
+## 连接前做五项审计
+
+1. **来源**：Server 来自官方、内部受控仓库还是未知包？谁维护版本？
+2. **能力**：它暴露哪些 Tools 和 Resources？是否包含写入、删除、发送或部署？
+3. **凭据**：API Key、OAuth Token 和数据库密码存在哪里？会不会进入仓库或 Prompt？
+4. **数据**：代码、查询、工具参数和返回值会发送到哪里、保留多久？
+5. **权限**：能否按 Server、Tool、Agent 和项目设置 allow、ask、deny？
+
+<Callout type="warning" title="工具描述也会消耗上下文">
+  MCP Server 暴露的工具越多，Agent 越难选择，工具说明也可能占用更多上下文。先只启用当前任务需要的 Server 和 Tool，不要把“能连接”变成“全部默认开启”。
+</Callout>
+
+## 第一次试点应该很小
+
+推荐从只读场景开始：
+
+```text
+目标：使用文档 MCP 查找框架的路由规范。
+允许：搜索并读取公开文档。
+禁止：写文件、发送消息、修改远程资源或上传仓库内容。
+交付：列出使用的 MCP Tool、查询词、来源链接和仍不确定的地方。
+```
+
+观察 Agent 实际调用了哪个 Tool、传出了什么参数、返回了什么，再决定是否扩大权限。不要把生产数据库写权限或企业消息发送能力作为第一个 MCP 练习。
+
+## OpenCode 与 Claude Code 中的 MCP
+
+- OpenCode 在配置的 `mcp` 字段中管理本地或远程 Server，并允许按全局或 Agent 权限控制 MCP Tools；
+- Claude Code 支持项目、用户等连接作用域，并可通过 `/mcp` 管理连接与 OAuth；
+- 两者的配置文件、认证方式、命令入口和工具命名不同，但安全问题相同：来源、凭据、数据、权限与审计。
+
+安装与连接前核对 [OpenCode MCP](https://opencode.ai/docs/mcp-servers/)、[Claude Code MCP](https://code.claude.com/docs/en/mcp)和 [Model Context Protocol](https://modelcontextprotocol.io/docs/)官方文档。
+
+<Checklist
+  id="tools-mcp"
+  items={[
+    "我能判断一个需求是否需要连接外部工具或数据",
+    "我知道本地 MCP 和远程 MCP 的主要信任边界",
+    "我不会把凭据写进仓库、Prompt 或 MCP 配置示例",
+    "我会从只读、最小 Tool 集开始验证新的 MCP Server"
+  ]}
+/>

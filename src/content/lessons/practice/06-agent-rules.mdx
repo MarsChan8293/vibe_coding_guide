@@ -1,0 +1,72 @@
+---
+title: "编写项目规则：AGENTS.md"
+description: "以本项目的 AGENTS.md 为例，把全局协作边界、验证流程和发布权限写成 Agent 能遵守的仓库规则。"
+section: practice
+order: 6
+estimatedMinutes: 18
+prerequisites: ["完成第一次安全会话", "知道项目需要哪些验证命令"]
+outcomes:
+  - "区分项目常驻规则与一次性 Prompt、规格和 Skill"
+  - "写出短小、可执行、可审查的 AGENTS.md"
+  - "为验证流程和发布权限设置明确边界"
+tags: ["AGENTS.md", "项目规则", "Harness"]
+reviewedAt: "2026-07-26"
+reviewedAgainst: ["本项目 AGENTS.md", "OpenCode Rules 官方文档", "Agent Harness 工程实践"]
+draft: false
+---
+
+import Checklist from "../../../components/Checklist.astro";
+
+项目规则文件解决的是一个具体问题：每次启动 Agent，都不必重新解释那些始终有效的协作边界。它不是一份巨大的 Prompt，也不是把所有任务步骤都提前写死。
+
+## 用 `/init` 生成可审查的初稿
+
+在仓库中启动 OpenCode，确认当前工作区状态后运行：
+
+```text
+/init
+```
+
+OpenCode 会扫描仓库中的重要文件，创建或更新 `AGENTS.md`。它通常会提取构建、测试、目录结构和项目约定，但生成结果只是**初稿**，不是自动生效的企业政策。
+
+运行后先检查：
+
+```bash
+git diff -- AGENTS.md
+```
+
+删除无法从仓库验证的推测，补上明确的验证顺序和发布边界，再决定是否提交。若仓库已有 `AGENTS.md`，`/init` 可能更新原文件，因此运行前必须先看 `git status`。具体行为以 [OpenCode Rules 官方文档](https://opencode.ai/docs/rules/)为准。
+
+## 先判断什么值得常驻
+
+适合写入 `AGENTS.md` 的内容通常满足三个条件：适用于大多数任务、能通过命令或文件状态检查、违反后会造成明显损失。例如验证命令、目录约定、权限边界和不可触碰的数据。
+
+一次性的页面需求、某个 Issue 的验收标准和只在特定任务触发的复杂流程，应分别放进 Prompt、规格文件或 Skill。
+
+## 以当前项目的 `AGENTS.md` 为例
+
+本项目的 [AGENTS.md](https://github.com/MarsChan8293/vibe_coding_guide/blob/main/AGENTS.md) 只有两组核心规则：
+
+| 规则组 | 文件中的约定 | 为什么常驻 |
+| --- | --- | --- |
+| 修改后验证 | 先运行 `npm test`，再运行 `npm run dev`；只有布局、样式、组件或交互改动才需要浏览器检查 | 每次修改都适用，而且结果可以被命令和人工检查验证 |
+| 发布边界 | 未明确要求时，不执行 `git push`、Pull Request、推送 `main` 或 GitHub Pages 部署 | 保护远程仓库和公开站点，必须在每次协作中保持一致 |
+
+这比“请 Agent 小心一点”更有用，因为它给出了顺序、例外、触发条件和禁止动作。
+
+## 写完之后做四项审查
+
+1. 这条规则是否适用于几乎所有任务，而不是只适用于一个页面？
+2. Agent 能否通过命令、Diff 或文件状态判断自己是否遵守？
+3. 是否明确了需要人工决定的边界？
+4. 是否与团队批准的工具、命令和发布流程一致？
+
+如果一条规则只对当前任务有用，就把它移回任务 Prompt 或规格；如果它需要复杂步骤、脚本和独立验证，就考虑封装为 Skill。保持 `AGENTS.md` 短小，规则才容易被持续读取和维护。
+
+<Checklist id="practice-agent-rules" items={[
+  "我运行 /init 后先审查了 AGENTS.md 的 Diff",
+  "我能区分 AGENTS.md、Prompt、规格和 Skill 的作用域",
+  "我写出了验证命令和发布边界",
+  "每条规则都能被观察或检查",
+  "规则没有混入某个单次任务的细节"
+]} />

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { BASE } from "../../lib/site";
 ---
 
 <BaseLayout
@@ -9,42 +10,46 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   <section class="cases-page site-shell">
     <header class="cases-header">
       <p class="eyebrow">Case files</p>
-      <h1>真实案例，<br /><em>即将入场。</em></h1>
-      <p>这个位置留给你提供的案例。材料到位后，我们会把一次真实协作拆开来看，不只展示结果，也保留过程与证据。</p>
+      <h1>真实案例，<br /><em>从过程入场。</em></h1>
+      <p>不只展示最后的代码。每个案例都会保留原始任务、Agent 协作过程、关键判断，以及可以复查的验证证据。</p>
     </header>
 
     <section class="case-placeholder" aria-labelledby="case-placeholder-title">
       <div class="case-number" aria-hidden="true">
         <span>CASE</span>
-        <strong>00</strong>
+        <strong>01</strong>
       </div>
       <div class="case-content">
-        <p class="case-status"><span></span> Reserved / 待补充</p>
-        <h2 id="case-placeholder-title">第一个案例的位置已经留好。</h2>
-        <p class="case-deck">收到案例材料后，这里会按照同一套结构整理，让读者能够看见 Agent 如何参与、哪里发生转折，以及什么证据证明结果可信。</p>
+        <p class="case-status"><span></span> Published / 实践复盘</p>
+        <h2 id="case-placeholder-title">一天，两个算子：用 Model Agent 复盘一场性能赛。</h2>
+        <p class="case-deck">以昇腾算子挑战赛年度冠军赛的 tensorEqual 与 GeluV2 为题，把需求澄清、Ascend C 设计、精度验证和性能迭代组织成一条可复查的 Agent 工作流。</p>
 
         <ol aria-label="案例内容结构">
           <li>
             <span>01</span>
-            <strong>原始任务</strong>
-            <small>问题、目标与边界</small>
+            <strong>赛题边界</strong>
+            <small>CANN 8.5.0 / 两个算子</small>
           </li>
           <li>
             <span>02</span>
-            <strong>协作过程</strong>
-            <small>输入、计划与分工</small>
+            <strong>Agent 工作流</strong>
+            <small>设计、实现与检查点</small>
           </li>
           <li>
             <span>03</span>
-            <strong>关键迭代</strong>
-            <small>失败、判断与修正</small>
+            <strong>双线优化</strong>
+            <small>TensorEqual / GeluV2</small>
           </li>
           <li>
             <span>04</span>
             <strong>验证证据</strong>
-            <small>测试、截图与结果</small>
+            <small>精度、Profiling 与交付</small>
           </li>
         </ol>
+
+        <a class="case-link" href={`${BASE}cases/ascend-operator-challenge/`}>
+          阅读完整案例 <span aria-hidden="true">↗</span>
+        </a>
       </div>
     </section>
   </section>
@@ -184,6 +189,28 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .case-content li strong {
     font-family: var(--serif);
     font-size: 1.12rem;
+  }
+
+  .case-link {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: .65rem;
+    margin-top: 2rem;
+    padding-bottom: .25rem;
+    border-bottom: 2px solid var(--red);
+    font: 750 .9rem/1.5 var(--mono);
+    text-decoration: none;
+  }
+
+  .case-link span {
+    color: var(--red);
+    font-size: 1.15rem;
+    transition: transform .18s ease;
+  }
+
+  .case-link:hover span {
+    transform: translate(.18rem, -.18rem);
   }
 
   @media (max-width: 980px) {

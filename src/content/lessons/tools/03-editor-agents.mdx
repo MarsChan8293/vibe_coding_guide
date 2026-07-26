@@ -1,23 +1,26 @@
 ---
 title: "编辑器型工具：在可见上下文里协作"
-description: "认识 Cursor、GitHub Copilot 等编辑器型工具的优势、限制，以及它们与终端 Agent 的真实差别。"
+description: "比较 Visual Studio Code + GitHub Copilot、Cursor 与 TRAE，理解三种编辑器型 AI Coding 路线及其中国使用边界。"
 section: tools
-order: 3
-estimatedMinutes: 9
+order: 2
+estimatedMinutes: 16
 prerequisites: ["理解模型、Agent、执行环境三层"]
 outcomes:
-  - "知道编辑器上下文为什么既方便又可能误导"
-  - "判断什么时候 IDE 内协作更合适"
+  - "区分插件型 AI 助手与 AI 原生编辑器"
+  - "比较 GitHub Copilot、Cursor 与 TRAE 的工作方式"
+  - "按账号、网络、数据与团队治理要求选择工具"
   - "避免把代码补全与自主 Agent 混为一谈"
-tags: ["Cursor", "GitHub Copilot", "IDE"]
-reviewedAt: "2026-07-25"
-reviewedAgainst: ["Cursor 官方文档", "GitHub Copilot 官方文档"]
+tags: ["Visual Studio Code", "GitHub Copilot", "Cursor", "TRAE", "IDE"]
+reviewedAt: "2026-07-26"
+reviewedAgainst: ["GitHub Copilot 官方文档", "Cursor 官方文档", "TRAE 官方资料", "JetBrains 2025 中国开发者调研"]
 draft: false
 ---
 
 import Callout from "../../../components/Callout.astro";
 
 编辑器型工具把 AI 放在代码旁边。你选中的文本、当前文件、诊断错误和版本差异都能成为上下文，这让第一次使用的人更容易建立信任。
+
+这不是一张“谁最强”的排行榜。[JetBrains 2025 中国开发者调研](https://blog.jetbrains.com/zh-hans/research/2026/01/insights-into-china-s-developer-landscape-key-trends/)显示，GitHub Copilot 和 Cursor 在中国受访者中的使用率分别约为 26% 和 23%；调研同时提醒，问卷没有覆盖全部本土工具。TRAE 官方披露的是全球注册与活跃数据，也不能直接当成中国市场份额。本课因此选择三种**在中国开发者中具有代表性的产品路线**，不编造精确排名。
 
 ## 同一个产品里可能有三种能力
 
@@ -29,27 +32,72 @@ import Callout from "../../../components/Callout.astro";
 
 从第一种到第三种，工具的行动范围越来越大，所需审查也越来越严格。
 
-## 编辑器型工具的优势
+## 三款工具代表三种路线
 
-- Diff、类型错误和文件树都在视线内；
-- 适合“我来主导，AI 帮我补一段”的高频协作；
-- 设计、前端和代码审查常能利用选区与截图；
-- 不需要记住太多终端命令。
+| 工具 | 产品形态 | 典型工作方式 | 更适合谁 | 先核对什么 |
+| --- | --- | --- | --- | --- |
+| **Visual Studio Code + GitHub Copilot** | 通用编辑器 + GitHub AI 服务 | 在熟悉的 VS Code 中使用补全、聊天、编辑、Agent、代码审查与工作区索引 | 已使用 VS Code、GitHub 和企业账号体系的团队 | Copilot 订阅、组织策略、可用模型、代码与聊天数据处理 |
+| **Cursor** | AI 原生代码编辑器 | 用 Ask 做只读探索，用 Agent 搜索代码库、编辑多文件、运行命令，再在 Diff 中审查 | 愿意更换编辑器、希望 AI 成为主要交互入口的个人与小团队 | 账号与订阅、模型服务可达性、代码库索引、后台 Agent 的网络和数据边界 |
+| **TRAE** | 面向中国与国际市场的 AI IDE | 在编辑器中结合补全、对话、Agent 与项目上下文，强调中文使用体验与开箱即用 | 重视国内网络体验、中文交互和较低上手门槛的学习者与团队 | 中国版/国际版差异、可用模型与额度、账号体系、企业部署和数据条款 |
+
+### Visual Studio Code + GitHub Copilot
+
+Visual Studio Code 本身是通用编辑器，**不是一个独立 AI Coding 产品**。课程里说的工具组合，是 VS Code 加上 GitHub Copilot 服务。
+
+[GitHub 官方功能矩阵](https://docs.github.com/en/copilot/reference/copilot-feature-matrix)显示，Copilot 在 VS Code 中已经不只是代码补全，还包括 Agent 模式、代码审查、工作区索引、MCP、自定义指令和 Agent Skills 等能力。它的优势是不用离开成熟的编辑器与 GitHub 工作流；限制是能力受 Copilot 订阅、组织策略、扩展版本和服务可用性共同影响。
+
+### Cursor
+
+Cursor 把 AI 变成编辑器的核心入口。[Cursor 官方文档](https://docs.cursor.com/agent)把常见工作方式分为 Ask、Agent 等模式：Ask 适合只读理解，Agent 可以自主探索代码库、修改多个文件并运行命令。
+
+它适合希望减少手动选文件、把完整任务交给 Agent 的用户。但“自动找到上下文”仍然可能找错；启用自动运行命令或后台 Agent 时，还要单独检查网络、仓库授权和数据保留边界。
+
+### TRAE
+
+TRAE 是 AI 原生 IDE，提供中国版和国际版。它的代表性来自中文交互、国内产品与模型生态，以及较低的试用门槛。[TRAE 官方年度报告](https://forum.trae.cn/t/topic/239)披露其 2025 年全球注册用户超过 600 万、月活超过 160 万；这些是厂商自报的全球数据，只用于说明产品规模，不代表中国市场份额。
+
+个人使用前要确认当天可用模型、额度与版本；企业使用则要进一步核对 SaaS、VPC 或其他部署方式、代码索引范围和管理员控制，而不是因为产品来自国内就默认满足合规要求。
+
+## 编辑器的优势也是风险
+
+编辑器让很多证据保持可见：
+
+- 文件树、选区、诊断和 Diff 在同一个界面；
+- 适合“人主导、AI 高频辅助”的补全和局部编辑；
+- 前端、设计还原和代码审查可以利用截图与可视化上下文；
+- 初学者不必先记住大量终端命令。
+
+但 Agent 模式可以调用终端、改写多个文件，甚至连接 MCP 服务。界面更友好，不代表权限更小。
 
 ## 它并不自动拥有完整上下文
 
 “AI 在编辑器里”不代表它看到了整个项目。被打开的文件、索引策略、忽略规则和上下文限制都会影响结果。一个常见错误是：用户以为工具知道某个接口，而它只看到了调用方。
 
-<Callout type="note" title="给零基础读者的建议">
-  编辑器适合观察和轻量修改，终端适合执行可重复的工程命令。两者不必互斥；但一套教程最好固定一个主线，否则学习成本会被界面切换吃掉。
+<Callout type="warning" title="国内能打开，不等于企业可批准">
+  下载成功、中文体验好、默认模型可用，只能证明个人可以开始试用。企业还必须确认数据传输位置、保留策略、账号管理、模型供应商、扩展更新与审计日志。
 </Callout>
 
-## 企业选型要问
+## 按场景做第一次选择
+
+| 你的起点 | 可以先试 | 理由 |
+| --- | --- | --- |
+| 团队已经统一使用 VS Code 与 GitHub | VS Code + GitHub Copilot | 改变最小，组织策略和仓库工作流集中 |
+| 个人开发，希望体验 AI-first 工作方式 | Cursor | Ask、Agent 与 Diff 审查形成完整编辑器循环 |
+| 中国网络环境、零基础或中文交互优先 | TRAE | 上手路径短，国内版产品与模型生态更近 |
+| 企业代码不能直接发送到未知云服务 | 先不选品牌 | 先完成数据分类、网络与部署审批，再做小规模试点 |
+
+无论选择哪一款，第一次试点都使用同一个低风险任务：只读解释一个公开或脱敏仓库，再做一次限定文件范围的小修改。不要用不同任务比较工具，否则你无法判断差异来自产品、模型还是任务本身。
+
+## 企业选型的五个问题
 
 - 代码和聊天内容发送到哪里？
-- 是否能固定或代理模型 Provider？
+- 使用了哪些模型和第三方处理方？
 - 工作区索引是否包含敏感目录？
 - Agent 命令是否有审批与日志？
-- 扩展更新能否由管理员控制？
+- 账号、扩展和版本更新能否由管理员控制？
 
 如果这些问题没有答案，再顺滑的界面也不适合作为企业默认工具。
+
+<Callout type="note" title="本教程为什么不三款都教">
+  工具介绍负责建立选择能力；后面的实践只使用 OpenCode。固定一条主线，能让零基础读者把注意力放在任务拆解、验证和安全边界，而不是反复适应界面。
+</Callout>

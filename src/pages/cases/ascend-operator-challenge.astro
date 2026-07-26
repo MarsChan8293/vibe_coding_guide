@@ -1,0 +1,1316 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { BASE } from "../../lib/site";
+
+const repoUrl = "https://gitcode.com/Ascend/model-agent/tree/v1.0.0rc1";
+const contestUrl =
+  "https://www.hiascend.com/developer/contests/details/698aca59975244d284aba384de7b0ff4?module=rank";
+---
+
+<BaseLayout
+  title="案例 01：用 Model Agent 复盘昇腾算子冠军赛"
+  description="以 tensorEqual 与 GeluV2 为例，展示如何用 Model Agent 组织 Ascend C 算子设计、验证和性能优化。"
+>
+  <article class="case-study">
+    <div class="site-shell">
+      <nav class="case-crumb" aria-label="面包屑">
+        <a href={`${BASE}cases/`}>案例</a>
+        <span aria-hidden="true">/</span>
+        <span>CASE 01</span>
+      </nav>
+
+      <header class="case-hero">
+        <div class="case-hero-copy">
+          <p class="eyebrow">Ascend C / Operator performance</p>
+          <h1>一天，两个算子，<br /><em>先证明正确，</em><br />再追性能。</h1>
+          <p class="case-lead">
+            以<strong>昇腾AI创新大赛-算子挑战赛第二届年度冠军赛【基础性能命题】</strong>为背景，
+            用 Model Agent 的 Skills 与工作流能力，复盘 tensorEqual 和 GeluV2 的工程化解题路径。
+          </p>
+        </div>
+
+        <aside class="case-brief" aria-label="案例摘要">
+          <p>CASE FILE</p>
+          <dl>
+            <div>
+              <dt>算子</dt>
+              <dd>tensorEqual<br />GeluV2</dd>
+            </div>
+            <div>
+              <dt>环境</dt>
+              <dd>CANN 社区版 8.5.0</dd>
+            </div>
+            <div>
+              <dt>目标</dt>
+              <dd>精度通过后压缩 AI Core 耗时</dd>
+            </div>
+            <div>
+              <dt>角色</dt>
+              <dd>人做判断，Agent 做工程放大</dd>
+            </div>
+          </dl>
+        </aside>
+      </header>
+
+      <div class="fact-strip" aria-label="赛事事实">
+        <div><span>比赛日</span><strong>2026.05.22</strong></div>
+        <div><span>命题数</span><strong>02</strong></div>
+        <div><span>参赛团队</span><strong>21</strong></div>
+        <div><span>评分顺序</span><strong>精度 → 性能</strong></div>
+      </div>
+
+      <aside class="truth-note">
+        <span>事实边界</span>
+        <p>
+          这是一个<strong>赛后教学复盘</strong>。比赛发生在 2026 年 5 月 22 日，而本文参考的
+          Model Agent <code>v1.0.0rc1</code> 于 2026 年 6 月 27 日发布。因此，本文不声称该仓库曾参与比赛，
+          也不虚构任何本地实测成绩；公开榜单数据与待执行的验证项会分开标注。
+        </p>
+      </aside>
+    </div>
+
+    <section class="case-section site-shell intro-grid" aria-labelledby="why-title">
+      <div class="section-marker">
+        <span>01</span>
+        <p>Why this case</p>
+      </div>
+      <div class="section-copy">
+        <p class="eyebrow">The engineering problem</p>
+        <h2 id="why-title">这不是“让 Agent 写两个 Kernel”，而是管理一条有证据的优化链。</h2>
+        <div class="two-column-copy">
+          <p>
+            赛题把正确性放在性能之前：不同数据类型、取值范围与 Shape 都可能进入验收；
+            浮点精度有明确容差，整数要求无误差。只有精度通过，AI Core 的 Profiling 耗时才有排名意义。
+          </p>
+          <p>
+            同时，Tiling 必须具备泛化能力，不能针对已公布样例硬编码。最适合 Agent 的部分，
+            正是把这些约束变成检查点、生成可重复的测试、保存每轮基线，并在失败后沿证据回退。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section model-agent-section" aria-labelledby="agent-title">
+      <div class="site-shell model-agent-inner">
+        <div class="section-marker light">
+          <span>02</span>
+          <p>Model Agent</p>
+        </div>
+        <div class="section-copy">
+          <p class="eyebrow">Repository capability map</p>
+          <h2 id="agent-title">把仓库功能翻译成一张算子开发工作台。</h2>
+          <p class="section-intro">
+            指定版本把 301 个主 Skill 分成 11 类，并提供动态工作流、检查点、重试、并行步骤与 MCP 工具接入。
+            对这个案例最有价值的不是 Skill 数量，而是已经形成了 Ascend C 端到端编排链。
+          </p>
+
+          <div class="capability-grid">
+            <article>
+              <span>PLAN</span>
+              <h3>动态工作流</h3>
+              <p>把两个算子拆成可并行分支，把环境、编译、精度和性能设为串行门禁，并在检查点恢复。</p>
+            </article>
+            <article>
+              <span>BUILD</span>
+              <h3>Ascend C 技能链</h3>
+              <p>从需求、Tiling、op_host / op_kernel 生成，到框架注册、编译与系统测试形成连续产物。</p>
+            </article>
+            <article>
+              <span>VERIFY</span>
+              <h3>精度与 Profiling</h3>
+              <p>用固定用例对照基线，先诊断误差分布，再检查搬运、对齐、多核和 API 使用。</p>
+            </article>
+            <article>
+              <span>LEARN</span>
+              <h3>经验沉淀</h3>
+              <p>把有效优化、失败原因和环境差异写回经验层，供下一轮计划和相似算子复用。</p>
+            </article>
+          </div>
+
+          <div class="skill-chain" aria-label="建议使用的 Skills">
+            <span>ascendc-env-check</span>
+            <span>ascendc-operator-design</span>
+            <span>ascendc-tiling-design</span>
+            <span>ascendc-operator-code-gen</span>
+            <span>ascendc-st-design</span>
+            <span>ascendc-operator-precision-debug</span>
+            <span>ascendc-operator-performance-eval</span>
+            <span>ascendc-operator-performance-optim</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section site-shell prompt-section" aria-labelledby="brief-title">
+      <div class="section-marker">
+        <span>03</span>
+        <p>Task brief</p>
+      </div>
+      <div class="section-copy">
+        <p class="eyebrow">Prompt as a contract</p>
+        <h2 id="brief-title">先把赛题改写成一份不会偷换目标的任务说明。</h2>
+        <p class="section-intro">
+          下面这段不是“万能提示词”，而是一份启动合同。正式执行时，要把官方题目包、接口文档和基线脚本一起放进上下文。
+        </p>
+
+        <pre><code>目标：
+为 tensorEqual 与 GeluV2 生成可提交的 Ascend C 实现，并在精度通过后优化 AI Core 执行时间。
+
+事实源优先级：
+1. 大赛官方题目包与算子接口文档
+2. CANN 社区版 8.5.0 文档与当前硬件实测
+3. 仓库内 Ascend C Skills
+
+硬约束：
+- 不猜测 dtype、Shape、广播、容差或计算公式；先从题目包提取
+- Tiling 必须覆盖未公开 Shape，不得为榜单样例硬编码
+- 每次性能修改后，使用同一组完整精度用例回归
+- FP16 / BF16 涉及复杂数学时，先升精度到 FP32；除非题目明确允许，不改变数学近似
+- 只用官方 Profiling 口径判断最终性能
+
+输出：
+- 环境报告与需求清单
+- 两个算子的 design.md、op_host、op_kernel 与 ST 用例
+- 每轮精度结果、Profiling 基线、修改原因和回退点
+- 按官方脚本生成的提交 zip；不得混入无关文件
+
+暂停并请求人工确认：
+- 题目定义存在歧义
+- 精度与性能目标冲突
+- 需要更改数学公式、近似模式或支持范围
+- 三轮优化后仍无稳定收益</code></pre>
+      </div>
+    </section>
+
+    <section class="case-section workflow-section" aria-labelledby="workflow-title">
+      <div class="site-shell workflow-inner">
+        <div class="section-marker">
+          <span>04</span>
+          <p>Workflow</p>
+        </div>
+        <div class="section-copy">
+          <p class="eyebrow">A vertical execution log</p>
+          <h2 id="workflow-title">一条主线、两个并行分支、四道硬门禁。</h2>
+
+          <ol class="workflow-timeline">
+            <li>
+              <div class="phase-id"><span>00</span><small>08:30</small></div>
+              <div>
+                <p class="phase-label">Gate / 事实冻结</p>
+                <h3>导入赛题包，先列出“已知、未知、禁止假设”。</h3>
+                <p>核对接口、输出语义、支持 dtype、Shape 约束、参考实现、基线脚本和提交目录。未确认的信息不进入代码。</p>
+                <div class="phase-output"><span>产物</span> requirements.md · acceptance-matrix.md</div>
+              </div>
+            </li>
+            <li>
+              <div class="phase-id"><span>01</span><small>09:00</small></div>
+              <div>
+                <p class="phase-label">Gate / 环境确认</p>
+                <h3>确认 NPU、CANN 8.5.0、工具链和设备占用。</h3>
+                <p>运行环境检查，保存 npu-smi、CANN 路径、编译器与自定义算子安装状态。环境不对，后续性能数字全部作废。</p>
+                <div class="phase-output"><span>产物</span> env-report.txt</div>
+              </div>
+            </li>
+            <li>
+              <div class="phase-id"><span>02</span><small>09:30</small></div>
+              <div>
+                <p class="phase-label">Parallel / 双算子设计</p>
+                <h3>分别完成算法、Tiling、Buffer 与尾块策略。</h3>
+                <p>两个分支共享验收矩阵，但各自维护设计文档。Agent 可以并行检索资料和生成候选方案，人负责批准语义与硬件取舍。</p>
+                <div class="phase-output"><span>产物</span> tensor_equal/design.md · gelu_v2/design.md</div>
+              </div>
+            </li>
+            <li>
+              <div class="phase-id"><span>03</span><small>11:00</small></div>
+              <div>
+                <p class="phase-label">Gate / 编译与精度</p>
+                <h3>生成 Host、Kernel 和测试，先拿到完整绿色基线。</h3>
+                <p>先通过小 Shape、尾块、多核和极值用例，再扩展到官方支持矩阵。失败时按误差分布 → 搬运对齐 → Tiling → API 陷阱定位。</p>
+                <div class="phase-output"><span>产物</span> op_host · op_kernel · precision-report.md</div>
+              </div>
+            </li>
+            <li>
+              <div class="phase-id"><span>04</span><small>14:00</small></div>
+              <div>
+                <p class="phase-label">Loop / 性能闭环</p>
+                <h3>固定用例，保存基线，每次只验证一个优化假设。</h3>
+                <p>围绕 Tiling、搬运、API、内存和流水逐项排查。每轮都记录“改了什么、为什么、精度是否保持、AI Core 时间是否下降”。</p>
+                <div class="phase-output"><span>产物</span> profiler/round_001… · optimization-log.md</div>
+              </div>
+            </li>
+            <li>
+              <div class="phase-id"><span>05</span><small>19:00</small></div>
+              <div>
+                <p class="phase-label">Gate / 提交封装</p>
+                <h3>冻结最后一次有效代码，再按官方脚本打包。</h3>
+                <p>源码必须与最后一次有效性能一致。只保留 op_host、op_kernel 与 custom_*.run，并使用主办方提供的脚本生成 zip。</p>
+                <div class="phase-output"><span>产物</span> submission.zip · final-evidence.md</div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section site-shell operators-section" aria-labelledby="operators-title">
+      <div class="section-marker">
+        <span>05</span>
+        <p>Two operators</p>
+      </div>
+      <div class="section-copy">
+        <p class="eyebrow">Different bottlenecks</p>
+        <h2 id="operators-title">两个算子不能套同一份“优化秘方”。</h2>
+        <p class="section-intro">
+          以下是进入实测前的<strong>优化假设</strong>，不是已经证明的结论。真正的路径必须由题目定义和 Profiling 数据选择。
+        </p>
+
+        <div class="operator-grid">
+          <article class="operator-card equal-card">
+            <header>
+              <span>OP / 01</span>
+              <h3>tensor<br />Equal</h3>
+              <p>比较与聚合路径</p>
+            </header>
+            <div class="operator-body">
+              <h4>先确认</h4>
+              <ul>
+                <li>两输入的 Shape、dtype 与广播规则</li>
+                <li>浮点是否为严格相等或带容差比较</li>
+                <li>输出是标量、张量，还是题目定义的其他形态</li>
+              </ul>
+              <h4>Profiling 假设</h4>
+              <ul>
+                <li>多核切分与最终聚合的同步成本</li>
+                <li>尾块、32B 对齐和 GM ↔ UB 搬运</li>
+                <li>小 Shape 下启动开销是否高于计算本身</li>
+              </ul>
+              <p class="operator-rule">不为已知 Shape 写特例；所有分支必须能由通用 Tiling 参数解释。</p>
+            </div>
+          </article>
+
+          <article class="operator-card gelu-card">
+            <header>
+              <span>OP / 02</span>
+              <h3>Gelu<br />V2</h3>
+              <p>逐元素复杂数学路径</p>
+            </header>
+            <div class="operator-body">
+              <h4>先确认</h4>
+              <ul>
+                <li>官方公式、approximate 模式与输入范围</li>
+                <li>支持 dtype 及对应精度阈值</li>
+                <li>是否允许等价近似，还是必须保持指定计算路径</li>
+              </ul>
+              <h4>Profiling 假设</h4>
+              <ul>
+                <li>复杂数学链路中的 Cast 与中间 Tensor 复用</li>
+                <li>双缓冲、搬运计算重叠和 Vector API 组合</li>
+                <li>大 Shape 的核间均衡与小 Shape 的固定开销</li>
+              </ul>
+              <p class="operator-rule">FP16 / BF16 复杂计算先升到 FP32；任何公式替换都必须先经人工确认。</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section scoreboard-section" aria-labelledby="score-title">
+      <div class="site-shell scoreboard-inner">
+        <div class="section-marker light">
+          <span>06</span>
+          <p>Public evidence</p>
+        </div>
+        <div class="section-copy">
+          <p class="eyebrow">Leaderboard snapshot</p>
+          <h2 id="score-title">公开结果只做参照，不冒充本案例的实测。</h2>
+          <p class="section-intro">
+            官方榜单显示，两个单项的头部性能由不同队伍获得；最终金奖队伍 Cishoon 在两个单项均排名第二。
+            这恰好说明总分赛制需要平衡两条优化线，而不是只押注一个算子。
+          </p>
+
+          <div class="score-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>算子</th>
+                  <th>公开第 1 名</th>
+                  <th>AI Core 耗时</th>
+                  <th>Cishoon</th>
+                  <th>AI Core 耗时</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>TensorEqual</th>
+                  <td>经常帮助跷家人</td>
+                  <td>9,387.166 μs</td>
+                  <td>#2</td>
+                  <td>13,169.541 μs</td>
+                </tr>
+                <tr>
+                  <th>GeluV2</th>
+                  <td>Tangefly</td>
+                  <td>1,889.272 μs</td>
+                  <td>#2</td>
+                  <td>2,028.137 μs</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="data-note">榜单算子名使用 “TensorEqual”；本文在叙述中沿用用户给出的 “tensorEqual”。数据读取于 2026-07-26。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section site-shell evidence-section" aria-labelledby="evidence-title">
+      <div class="section-marker">
+        <span>07</span>
+        <p>Evidence</p>
+      </div>
+      <div class="section-copy">
+        <p class="eyebrow">Definition of done</p>
+        <h2 id="evidence-title">没有这七类证据，就不能说“做完了”。</h2>
+
+        <ol class="evidence-board">
+          <li><span>01</span><strong>环境快照</strong><small>NPU / CANN / 编译器 / 设备状态</small><em>待实测</em></li>
+          <li><span>02</span><strong>需求矩阵</strong><small>dtype / Shape / 范围 / 容差 / 公式</small><em>待导入题目包</em></li>
+          <li><span>03</span><strong>设计文档</strong><small>算法 / Tiling / Buffer / 尾块</small><em>待生成</em></li>
+          <li><span>04</span><strong>源码产物</strong><small>op_host / op_kernel / 注册与编译</small><em>待实现</em></li>
+          <li><span>05</span><strong>精度报告</strong><small>完整支持矩阵与失败归因</small><em>待上板</em></li>
+          <li><span>06</span><strong>性能报告</strong><small>同用例基线、每轮改动与 AI Core 耗时</small><em>待上板</em></li>
+          <li><span>07</span><strong>提交归档</strong><small>源码与 custom_*.run 一致的官方 zip</small><em>待封版</em></li>
+        </ol>
+
+        <div class="acceptance-grid">
+          <div>
+            <span>FLOAT16</span>
+            <strong>≤ 1‰</strong>
+            <small>官方通用精度标准</small>
+          </div>
+          <div>
+            <span>FLOAT32</span>
+            <strong>≤ 0.1‰</strong>
+            <small>官方通用精度标准</small>
+          </div>
+          <div>
+            <span>INT8 / INT32</span>
+            <strong>零误差</strong>
+            <small>仅在题目实际支持时适用</small>
+          </div>
+          <div>
+            <span>PERFORMANCE</span>
+            <strong>≤ 基线</strong>
+            <small>按官方 Profiling 口径</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section decision-section" aria-labelledby="decision-title">
+      <div class="site-shell decision-inner">
+        <div class="section-marker">
+          <span>08</span>
+          <p>Human in the loop</p>
+        </div>
+        <div class="section-copy">
+          <p class="eyebrow">Responsibility stays human</p>
+          <h2 id="decision-title">Agent 可以加速执行，但不能替你承担赛题判断。</h2>
+
+          <div class="decision-grid">
+            <div>
+              <h3>交给 Agent</h3>
+              <ul>
+                <li>整理题目约束并生成覆盖矩阵</li>
+                <li>生成设计草案、代码骨架和测试</li>
+                <li>批量运行检查、解析误差与 Profiling</li>
+                <li>保存基线、比较迭代、整理交付文档</li>
+              </ul>
+            </div>
+            <div>
+              <h3>必须由人确认</h3>
+              <ul>
+                <li>算子语义与数学公式是否解释正确</li>
+                <li>近似计算是否在赛题允许范围内</li>
+                <li>性能收益是否来自公平、可泛化的实现</li>
+                <li>最终代码、运行包与提交材料是否一致</li>
+              </ul>
+            </div>
+          </div>
+
+          <blockquote>
+            最好的 Agent 产物不是“一份看起来很快的 Kernel”，而是一条别人能够复查、重跑并解释的证据链。
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <footer class="case-sources site-shell">
+      <p class="eyebrow">Sources / 资料</p>
+      <h2>继续核对原始资料</h2>
+      <div class="source-links">
+        <a href={repoUrl} target="_blank" rel="noreferrer">
+          <span>01</span>
+          <strong>Model Agent v1.0.0rc1</strong>
+          <small>仓库功能、工作流与 Ascend C Skills</small>
+        </a>
+        <a href={contestUrl} target="_blank" rel="noreferrer">
+          <span>02</span>
+          <strong>冠军赛基础性能命题</strong>
+          <small>赛题规则、评分、获奖公示与公开榜单</small>
+        </a>
+      </div>
+      <a class="back-link" href={`${BASE}cases/`}>← 返回案例索引</a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .case-study {
+    --case-line: rgba(24, 24, 21, .28);
+    overflow: hidden;
+  }
+
+  .case-crumb {
+    display: flex;
+    gap: .65rem;
+    padding-top: 2rem;
+    color: var(--muted);
+    font: 650 .72rem/1 var(--mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .case-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 2.2fr) minmax(260px, .8fr);
+    gap: clamp(3rem, 8vw, 9rem);
+    align-items: end;
+    padding: clamp(4rem, 8vw, 8rem) 0 4rem;
+  }
+
+  .case-hero h1,
+  .case-section h2,
+  .case-sources h2 {
+    font-family: var(--serif);
+    text-wrap: balance;
+  }
+
+  .case-hero h1 {
+    max-width: 1080px;
+    margin: 0;
+    font-size: clamp(3.7rem, 7.8vw, 8.6rem);
+    font-weight: 780;
+    letter-spacing: -.065em;
+    line-height: .91;
+  }
+
+  .case-hero h1 em {
+    color: var(--red);
+    font-style: italic;
+  }
+
+  .case-lead {
+    max-width: 900px;
+    margin: 2.5rem 0 0;
+    font-family: var(--serif);
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    line-height: 1.75;
+  }
+
+  .case-brief {
+    border-top: 5px solid var(--red);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .case-brief > p {
+    margin: 0;
+    padding: .9rem 0;
+    border-bottom: 1px solid var(--ink);
+    font: 750 .7rem/1 var(--mono);
+    letter-spacing: .14em;
+  }
+
+  .case-brief dl {
+    margin: 0;
+  }
+
+  .case-brief dl div {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 1rem;
+    padding: .9rem 0;
+    border-bottom: 1px solid var(--soft-line);
+  }
+
+  .case-brief dl div:last-child {
+    border-bottom: 0;
+  }
+
+  .case-brief dt {
+    color: var(--muted);
+    font: .7rem/1.5 var(--mono);
+  }
+
+  .case-brief dd {
+    margin: 0;
+    font-size: .92rem;
+    font-weight: 680;
+    line-height: 1.55;
+  }
+
+  .fact-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--ink);
+  }
+
+  .fact-strip div {
+    display: grid;
+    min-height: 116px;
+    align-content: space-between;
+    padding: 1rem 1.2rem;
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .fact-strip span,
+  .fact-strip strong {
+    font-family: var(--mono);
+  }
+
+  .fact-strip span {
+    color: var(--muted);
+    font-size: .68rem;
+    letter-spacing: .08em;
+  }
+
+  .fact-strip strong {
+    font-size: clamp(1rem, 2vw, 1.35rem);
+  }
+
+  .truth-note {
+    display: grid;
+    grid-template-columns: 10rem minmax(0, 1fr);
+    gap: 2rem;
+    margin-top: 2rem;
+    padding: 1.25rem 1.5rem;
+    border-left: 5px solid var(--red);
+    background: rgba(255, 255, 255, .28);
+  }
+
+  .truth-note > span {
+    padding-top: .35rem;
+    color: var(--red-dark);
+    font: 750 .72rem/1.5 var(--mono);
+    letter-spacing: .1em;
+  }
+
+  .truth-note p {
+    margin: 0;
+  }
+
+  .truth-note code {
+    font-family: var(--mono);
+    font-size: .85em;
+  }
+
+  .case-section {
+    padding-block: clamp(5rem, 10vw, 10rem);
+  }
+
+  .case-section.site-shell,
+  .model-agent-inner,
+  .workflow-inner,
+  .scoreboard-inner,
+  .decision-inner {
+    display: grid;
+    grid-template-columns: minmax(110px, .52fr) minmax(0, 3fr);
+    gap: clamp(2rem, 6vw, 7rem);
+  }
+
+  .section-marker {
+    display: flex;
+    height: fit-content;
+    align-items: baseline;
+    gap: .9rem;
+    border-top: 1px solid var(--ink);
+    padding-top: .8rem;
+  }
+
+  .section-marker > span {
+    color: var(--red);
+    font: 760 2rem/1 var(--serif);
+  }
+
+  .section-marker p {
+    margin: 0;
+    font: 650 .66rem/1.4 var(--mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .section-copy {
+    min-width: 0;
+  }
+
+  .section-copy > .eyebrow {
+    margin-bottom: 1.5rem;
+  }
+
+  .case-section h2,
+  .case-sources h2 {
+    max-width: 1050px;
+    margin: 0;
+    font-size: clamp(2.4rem, 5vw, 5.6rem);
+    font-weight: 740;
+    letter-spacing: -.05em;
+    line-height: 1.02;
+  }
+
+  .section-intro {
+    max-width: 860px;
+    margin: 2rem 0 0;
+    color: var(--muted);
+    font-family: var(--serif);
+    font-size: 1.12rem;
+  }
+
+  .two-column-copy {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1000px;
+    margin-top: 3rem;
+  }
+
+  .two-column-copy p {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+
+  .model-agent-section,
+  .scoreboard-section {
+    color: var(--paper);
+    background:
+      linear-gradient(135deg, rgba(201, 66, 44, .08), transparent 38%),
+      #181815;
+  }
+
+  .model-agent-inner,
+  .workflow-inner,
+  .scoreboard-inner,
+  .decision-inner {
+    width: min(calc(100% - 3rem), var(--max));
+    margin-inline: auto;
+  }
+
+  .model-agent-section .eyebrow,
+  .scoreboard-section .eyebrow {
+    color: #e98774;
+  }
+
+  .section-marker.light {
+    border-color: rgba(241, 234, 219, .4);
+  }
+
+  .capability-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 4rem;
+    border-top: 1px solid rgba(241, 234, 219, .5);
+    border-left: 1px solid rgba(241, 234, 219, .5);
+  }
+
+  .capability-grid article {
+    min-height: 230px;
+    padding: 1.5rem;
+    border-right: 1px solid rgba(241, 234, 219, .5);
+    border-bottom: 1px solid rgba(241, 234, 219, .5);
+  }
+
+  .capability-grid article > span {
+    color: #e98774;
+    font: 700 .66rem/1 var(--mono);
+    letter-spacing: .15em;
+  }
+
+  .capability-grid h3 {
+    margin: 3.5rem 0 .7rem;
+    font-family: var(--serif);
+    font-size: 1.55rem;
+  }
+
+  .capability-grid p {
+    max-width: 520px;
+    margin: 0;
+    color: #bdb7aa;
+  }
+
+  .skill-chain {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    margin-top: 2rem;
+  }
+
+  .skill-chain span {
+    padding: .5rem .7rem;
+    border: 1px solid rgba(241, 234, 219, .38);
+    color: #d8d2c5;
+    font: .68rem/1.3 var(--mono);
+  }
+
+  .prompt-section pre {
+    position: relative;
+    overflow-x: auto;
+    max-width: 980px;
+    margin: 3rem 0 0;
+    padding: 3.5rem 1.4rem 1.5rem;
+    border: 1px solid #383830;
+    background: #161713;
+    box-shadow: 10px 10px 0 rgba(201, 66, 44, .35);
+  }
+
+  .prompt-section pre::before {
+    position: absolute;
+    inset: 0 0 auto;
+    padding: .65rem 1rem;
+    border-bottom: 1px solid #45473d;
+    color: #a8a997;
+    content: "TASK CONTRACT / COPY";
+    font: 650 .65rem/1 var(--mono);
+    letter-spacing: .12em;
+  }
+
+  .prompt-section code {
+    color: #f1eadb;
+    font: .82rem/1.8 var(--mono);
+  }
+
+  .workflow-section {
+    padding-top: 0;
+  }
+
+  .workflow-timeline {
+    position: relative;
+    margin: 4rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .workflow-timeline::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 3.45rem;
+    width: 1px;
+    content: "";
+    background: var(--ink);
+  }
+
+  .workflow-timeline li {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: 2rem;
+    min-height: 235px;
+    padding-bottom: 3rem;
+  }
+
+  .phase-id {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: 7rem;
+    height: 7rem;
+    place-items: center;
+    align-content: center;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+  }
+
+  .phase-id span {
+    color: var(--red);
+    font: 760 2.6rem/.9 var(--serif);
+  }
+
+  .phase-id small {
+    margin-top: .5rem;
+    color: var(--muted);
+    font: .62rem/1 var(--mono);
+  }
+
+  .phase-label {
+    margin: 0 0 .55rem;
+    color: var(--red-dark);
+    font: 720 .7rem/1.5 var(--mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .workflow-timeline h3 {
+    max-width: 820px;
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(1.55rem, 3vw, 2.4rem);
+    line-height: 1.25;
+  }
+
+  .workflow-timeline li > div:last-child > p:not(.phase-label) {
+    max-width: 820px;
+    margin: 1rem 0;
+    color: var(--muted);
+  }
+
+  .phase-output {
+    width: fit-content;
+    padding: .5rem .75rem;
+    border: 1px solid var(--case-line);
+    font: .68rem/1.5 var(--mono);
+  }
+
+  .phase-output span {
+    margin-right: .55rem;
+    color: var(--red-dark);
+    font-weight: 750;
+  }
+
+  .operator-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .operator-card {
+    border: 1px solid var(--ink);
+    background: rgba(255, 255, 255, .2);
+    box-shadow: 8px 8px 0 rgba(24, 24, 21, .12);
+  }
+
+  .operator-card header {
+    position: relative;
+    min-height: 330px;
+    overflow: hidden;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .operator-card header::after {
+    position: absolute;
+    right: -1rem;
+    bottom: -4rem;
+    color: rgba(201, 66, 44, .1);
+    content: "∑";
+    font: 760 17rem/.7 var(--serif);
+  }
+
+  .gelu-card header::after {
+    content: "ƒ";
+  }
+
+  .operator-card header > span {
+    font: 700 .68rem/1 var(--mono);
+    letter-spacing: .12em;
+  }
+
+  .operator-card h3 {
+    position: relative;
+    z-index: 1;
+    margin: 3rem 0 0;
+    font: 760 clamp(3.5rem, 7vw, 6.5rem)/.72 var(--serif);
+    letter-spacing: -.07em;
+  }
+
+  .operator-card header p {
+    position: absolute;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    z-index: 1;
+    margin: 0;
+    color: var(--red-dark);
+    font: 700 .7rem/1 var(--mono);
+  }
+
+  .operator-body {
+    padding: 2rem;
+  }
+
+  .operator-body h4 {
+    margin: 1.8rem 0 .6rem;
+    color: var(--red-dark);
+    font: 750 .72rem/1 var(--mono);
+    letter-spacing: .1em;
+  }
+
+  .operator-body h4:first-child {
+    margin-top: 0;
+  }
+
+  .operator-body ul {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+
+  .operator-body li {
+    margin: .45rem 0;
+  }
+
+  .operator-rule {
+    margin: 2rem 0 0;
+    padding: 1rem;
+    border-left: 4px solid var(--red);
+    background: rgba(201, 66, 44, .08);
+    font-family: var(--serif);
+  }
+
+  .score-table-wrap {
+    overflow-x: auto;
+    margin-top: 3rem;
+  }
+
+  .score-table-wrap table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+  }
+
+  .score-table-wrap th,
+  .score-table-wrap td {
+    padding: 1rem;
+    border: 1px solid rgba(241, 234, 219, .35);
+    text-align: left;
+  }
+
+  .score-table-wrap thead th {
+    color: #e98774;
+    font: 700 .68rem/1.4 var(--mono);
+    letter-spacing: .06em;
+  }
+
+  .score-table-wrap tbody th {
+    font-family: var(--mono);
+  }
+
+  .data-note {
+    color: #9f9a8f;
+    font-size: .78rem;
+  }
+
+  .evidence-board {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin: 4rem 0 0;
+    padding: 0;
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--ink);
+    list-style: none;
+  }
+
+  .evidence-board li {
+    display: grid;
+    min-height: 230px;
+    align-content: space-between;
+    padding: 1rem;
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .evidence-board span,
+  .evidence-board small,
+  .evidence-board em {
+    font-family: var(--mono);
+    font-size: .65rem;
+    line-height: 1.5;
+  }
+
+  .evidence-board span {
+    color: var(--red-dark);
+    font-weight: 750;
+  }
+
+  .evidence-board strong {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+  }
+
+  .evidence-board small {
+    color: var(--muted);
+  }
+
+  .evidence-board em {
+    width: fit-content;
+    padding: .25rem .4rem;
+    color: var(--red-dark);
+    background: rgba(201, 66, 44, .08);
+    font-style: normal;
+  }
+
+  .acceptance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .acceptance-grid div {
+    display: grid;
+    min-height: 150px;
+    align-content: space-between;
+    padding: 1rem;
+    border-top: 4px solid var(--red);
+    background: rgba(255, 255, 255, .3);
+  }
+
+  .acceptance-grid span,
+  .acceptance-grid small {
+    font: .66rem/1.5 var(--mono);
+  }
+
+  .acceptance-grid span {
+    color: var(--red-dark);
+    font-weight: 750;
+  }
+
+  .acceptance-grid strong {
+    font: 720 1.7rem/1 var(--serif);
+  }
+
+  .acceptance-grid small {
+    color: var(--muted);
+  }
+
+  .decision-section {
+    background:
+      linear-gradient(90deg, transparent 49.9%, rgba(24, 24, 21, .08) 50%, transparent 50.1%) 0 0/40px 100%,
+      var(--paper-deep);
+  }
+
+  .decision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 4rem;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+  }
+
+  .decision-grid > div {
+    padding: 2rem;
+  }
+
+  .decision-grid > div + div {
+    border-left: 1px solid var(--ink);
+  }
+
+  .decision-grid h3 {
+    margin: 0 0 1.5rem;
+    font: 720 1.7rem/1.2 var(--serif);
+  }
+
+  .decision-grid li {
+    margin: .7rem 0;
+  }
+
+  .decision-section blockquote {
+    max-width: 940px;
+    margin: 4rem 0 0;
+    padding: 1rem 0 1rem 2rem;
+    border-left: 8px solid var(--red);
+    font: 650 clamp(1.6rem, 3vw, 2.8rem)/1.45 var(--serif);
+  }
+
+  .case-sources {
+    padding-block: clamp(5rem, 10vw, 9rem);
+  }
+
+  .source-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .source-links a {
+    display: grid;
+    min-height: 180px;
+    align-content: space-between;
+    padding: 1.4rem;
+    border: 1px solid var(--ink);
+    text-decoration: none;
+    transition: color .18s ease, background .18s ease, transform .18s ease;
+  }
+
+  .source-links a:hover {
+    color: var(--paper);
+    background: var(--ink);
+    transform: translateY(-4px);
+  }
+
+  .source-links span,
+  .source-links small {
+    font: .68rem/1.5 var(--mono);
+  }
+
+  .source-links span {
+    color: var(--red);
+    font-weight: 750;
+  }
+
+  .source-links strong {
+    font: 700 1.5rem/1.3 var(--serif);
+  }
+
+  .source-links small {
+    color: var(--muted);
+  }
+
+  .source-links a:hover small {
+    color: #bdb7aa;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 3rem;
+    font: 700 .8rem/1.5 var(--mono);
+  }
+
+  @media (max-width: 1080px) {
+    .case-hero {
+      grid-template-columns: 1fr;
+    }
+
+    .case-brief {
+      max-width: 640px;
+    }
+
+    .evidence-board {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  @media (max-width: 820px) {
+    .case-section.site-shell,
+    .model-agent-inner,
+    .workflow-inner,
+    .scoreboard-inner,
+    .decision-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .section-marker {
+      max-width: 180px;
+    }
+
+    .fact-strip,
+    .acceptance-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .truth-note,
+    .two-column-copy,
+    .operator-grid,
+    .source-links {
+      grid-template-columns: 1fr;
+    }
+
+    .truth-note {
+      gap: .5rem;
+    }
+
+    .evidence-board {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .case-hero {
+      padding-top: 3.5rem;
+    }
+
+    .case-hero h1 {
+      font-size: clamp(3.2rem, 15vw, 4.8rem);
+    }
+
+    .case-hero-copy,
+    .case-brief,
+    .section-copy {
+      min-width: 0;
+    }
+
+    .fact-strip div {
+      min-height: 100px;
+      padding: .85rem;
+    }
+
+    .case-section {
+      padding-block: 5rem;
+    }
+
+    .capability-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .capability-grid article {
+      min-height: 205px;
+    }
+
+    .workflow-timeline::before {
+      left: 2.45rem;
+    }
+
+    .workflow-timeline li {
+      grid-template-columns: 5rem minmax(0, 1fr);
+      gap: 1.2rem;
+      min-height: 280px;
+    }
+
+    .phase-id {
+      width: 5rem;
+      height: 5rem;
+    }
+
+    .phase-id span {
+      font-size: 2rem;
+    }
+
+    .phase-id small {
+      font-size: .55rem;
+    }
+
+    .phase-output {
+      overflow-wrap: anywhere;
+    }
+
+    .operator-card header {
+      min-height: 260px;
+    }
+
+    .operator-card h3 {
+      font-size: 4.1rem;
+    }
+
+    .operator-body {
+      padding: 1.4rem;
+    }
+
+    .evidence-board {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .evidence-board li {
+      min-height: 205px;
+      padding: .8rem;
+    }
+
+    .acceptance-grid,
+    .decision-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .decision-grid > div + div {
+      border-top: 1px solid var(--ink);
+      border-left: 0;
+    }
+  }
+</style>

@@ -1,15 +1,15 @@
 ---
-title: "让计划可以逐步验收"
-description: "把“做一个作品集”拆成有依赖、有证据的小任务，并把项目规则留在仓库中。"
+title: "拆解、生成与验证当前项目"
+description: "以 vibe_coding_guide 的实际改版为例，把需求拆成可回滚的小任务，再用内容校验、构建和页面检查验证每一轮结果。"
 section: practice
-order: 8
-estimatedMinutes: 18
-prerequisites: ["BRIEF.md 与 CONTENT.md 已提交"]
+order: 9
+estimatedMinutes: 32
+prerequisites: ["完成与 AI 的项目需求沟通", "项目规则与目录范围已经确认"]
 outcomes:
-  - "生成并审查项目实施计划"
-  - "为每步定义可观察的完成证据"
-  - "创建不会随对话消失的项目规则"
-tags: ["计划", "任务拆解", "AGENTS.md"]
+  - "把一次教程改版拆成有顺序、有限文件范围的任务"
+  - "让 Agent 先生成计划，再按轮次修改当前仓库"
+  - "用测试、构建、页面和 Git diff 证实结果，而不是只听 Agent 宣布完成"
+tags: ["计划", "任务拆解", "生成", "验证"]
 reviewedAt: "2026-07-25"
 reviewedAgainst: ["Agentic Coding 常用任务拆解实践"]
 draft: false
@@ -18,82 +18,132 @@ draft: false
 import Callout from "../../../components/Callout.astro";
 import Checklist from "../../../components/Checklist.astro";
 
-“做完整网站”太大。Agent 可能在一次会话里同时决定技术、内容、视觉和部署，任何一步偏离都难以定位。
+“改完整个教程网站”太大。Agent 可能同时决定内容、导航、样式和发布，任何一步偏离都难以定位。本章直接复盘 `vibe_coding_guide` 的改版过程：怎样盘点现状，怎样把需求拆成小轮次，怎样让 Agent 生成内容，以及怎样用测试和页面证据验收。
 
-## 请求一份计划，而不是代码
+## 第一步：先盘点当前仓库
+
+在让 Agent 修改前，先让它读取项目规则、README、课程目录和测试，不要急着生成代码：
 
 ```text
-阅读 README.md、BRIEF.md 和 CONTENT.md。
-现在不要修改任何文件。
-
-请给出一个 6–8 步实施计划，每一步必须包含：
-- 目标；
-- 预计修改的文件；
-- 依赖的前一步；
-- 可运行或可观察的验收证据；
-- 主要风险。
-
-约束：Astro 静态站、无外部 CDN、首版不加博客和后端。
+请先阅读 AGENTS.md、README.md、src/content/lessons/、src/pages/ 和 tests/。
+现在不要修改文件。
+请列出：
+1. 当前历史、工具、实践、方法各有多少篇；
+2. 每篇课程的路由、order 和前置依赖；
+3. 导航、总课数、校验脚本和测试分别在哪里；
+4. 本轮需求会影响哪些文件；
+5. 哪些内容目前没有实例，不能凭空补写。
 ```
 
-计划至少应覆盖：
+本项目的盘点结果是：1 篇历史、8 篇工具、9 篇实践和 8 篇方法。这个数字不是写在提示词里的目标，而是由 `src/content/lessons/` 和 `scripts/validate-content.mjs` 共同约束的事实。先读现状，才能避免把已经删除的章节重新生成出来。
 
-1. 初始化 Astro 与基础构建；
-2. 建立设计变量和语义结构；
-3. 写入真实内容；
-4. 实现响应式布局；
-5. 检查无障碍；
-6. 构建与浏览器验证；
-7. 配置 GitHub Pages。
+## 第二步：把本轮改版拆成任务
 
-## 检查计划是否真的可执行
+结合上一章已经确认的范围，可以把本项目的修改拆成以下轮次：
 
-删掉或改写这些步骤：
+1. **历史轮**：调整 2025 年至今的模型发布与 Agent 工具双轨时间轴，按真实时间错开卡片；
+2. **工具轮**：限定 Claude、OpenAI、Gemini、DeepSeek、GLM、Kimi 的模型范围，调整 OpenCode 与终端 Agent 的顺序；
+3. **实践轮**：增加当前项目的 `AGENTS.md` 编写和 `grill-me` 安装，删除不需要的章节，合并生成与验证内容；
+4. **方法轮**：补充八个已经确认的工程方法和对应的 Skill / Plugin 示例；
+5. **一致性轮**：同步课程 order、侧栏标题、导航名称、总数校验和站内测试；
+6. **验收轮**：运行完整测试、生产构建、Pagefind 和链接检查，再检查受影响页面。
 
-- “优化用户体验”——没有说明观察什么；
-- “完善所有页面”——范围过大；
-- “确保没有 Bug”——无法证明；
-- “必要时重构”——给 Agent 无限范围；
-- 同一步同时初始化、设计、部署。
+每轮都写清楚目标、文件范围和验收证据。例如实践轮只改 `src/content/lessons/practice/`、校验脚本和相关测试，不顺手重做全站样式。这样某一轮失败时，可以准确判断是内容、目录还是构建问题。
 
-<Callout type="note" title="好的步骤能单独失败">
-  如果一步失败，你应该能知道是内容、样式、构建还是部署问题。无法单独验证的步骤通常还不够小。
-</Callout>
+## 第三步：先让 Agent 复述计划
 
-## 创建项目规则
+可以把当前轮次交给 Agent，但要求它先给计划：
 
-把稳定约束写入 `AGENTS.md`：
-
-```markdown
-# Project rules
-
-- 先阅读 BRIEF.md 和 CONTENT.md。
-- 不得虚构个人经历、客户或项目数据。
-- 不引入外部运行时 CDN、分析脚本或后端服务。
-- 每次只完成计划中的一个步骤。
-- 修改后运行 npm run build。
-- 不自动执行 git commit、git push 或删除命令。
-- 汇报修改文件、验证结果和剩余风险。
+```text
+基于刚才的仓库盘点，只处理“实践轮”。
+先不要修改文件，请先列出：
+- 要新增、修改、删除的具体文件；
+- 每个文件要解决的一个问题；
+- 课程顺序和总数会如何变化；
+- 修改后运行哪些验证命令；
+- 哪些决定仍需要我确认。
+等我确认计划后再开始。
 ```
 
-项目规则不是一份巨大的提示词。只放所有任务都应遵守、违反后会造成明显损失的规则。
+计划中如果出现“优化所有页面”“完善用户体验”“必要时重构”等无法验收的句子，就继续追问。好的任务应该能回答：改哪个文件、改到什么状态、用什么证据证明完成。
 
-## 保存计划
+## 第四步：按小轮次生成和修改
 
-让 Agent 把确认后的计划写入 `PLAN.md`，然后检查并提交：
+本项目的实践轮可以这样执行：
+
+```text
+现在只完成已确认的实践轮：
+1. 新增 practice/06-agent-rules.mdx，内容以当前 AGENTS.md 为实例；
+2. 将 practice/06-portfolio-brief.mdx 改为“与AI进行项目需求沟通”，复盘真实的 grill-me 过程；
+3. 将 practice/07-task-breakdown.mdx 改为当前仓库案例；
+4. 将 grill-me 安装章节放在需求沟通之前；
+5. 删除已经确认不需要的章节并重新编号。
+不要修改工具、历史、方法或样式文件。完成后先展示 diff 摘要。
+```
+
+每轮修改后先看范围：
 
 ```bash
-git add AGENTS.md PLAN.md
-git commit -m "Define implementation plan and agent rules"
+git diff --stat
+git status --short
+git diff -- src/content/lessons/practice src/lib/site.ts scripts/validate-content.mjs tests/site.spec.ts
 ```
 
+如果发现 Agent 顺手改了不在范围内的文件，先回退这部分或要求它解释原因；不要因为页面“看起来更完整”就接受未经确认的扩展。
+
+## 第五步：用证据验证生成结果
+
+本项目的内容、类型和生产产物由同一条命令验证：
+
+```bash
+npm test
+```
+
+它会依次检查：
+
+- 课程数量、section、frontmatter、草稿状态、密钥和内网地址；
+- Astro / TypeScript 诊断；
+- 生产构建、Pagefind 中文索引和站内链接、静态资源解析。
+
+命令通过后再启动本地服务：
+
+```bash
+npm run dev
+```
+
+涉及布局、样式、组件、交互、响应式或资源路径时，还要打开受影响页面检查；纯文案或 MDX 元数据修改只需完成测试和本地服务启动。无论是否打开浏览器，都不能把“Agent 说完成了”当作验收证据。
+
+<Callout type="note" title="验证的是需求，不只是代码能构建">
+  构建成功只能证明 Astro 能生成页面。还要对照已经确认的需求检查：历史是否从 2025 年开始、模型范围是否正确、工具和实践顺序是否正确、删除的章节是否真的消失、导航标题是否统一，以及当前页面是否仍有真实实例。
+</Callout>
+
+## 第六步：阅读最终 Diff
+
+验收最后回到仓库事实：
+
+```bash
+git diff --stat
+git diff -- src/content/lessons/history src/content/lessons/tools src/content/lessons/practice src/content/lessons/methods
+git status --short
+```
+
+重点检查：
+
+- 新增内容是否来自已经确认的对话，而不是 Agent 自行编造；
+- 删除和合并是否反映真实需求；
+- 课程 order、侧栏、首页和总数校验是否一致；
+- 没有真实 API Key、客户内部地址或未授权发布动作；
+- 测试失败时是否保留了可定位的错误，而不是绕过校验。
+
+本项目的计划留在对话和任务拆解中，实际可回溯的产物是 MDX、校验脚本、测试结果和 Git diff，不需要额外创建没有实例的计划文档。提交、推送和 GitHub Pages 发布也必须等用户明确授权。
+
 <Checklist
-  id="practice-plan"
+  id="practice-project-loop"
   items={[
-    "计划包含 6–8 个有顺序的小步骤",
-    "每一步都有文件范围和验收证据",
-    "模糊、无限范围的步骤已被改写",
-    "AGENTS.md 只包含稳定规则",
-    "计划和规则已提交到 Git"
+    "先盘点当前仓库和课程数量，再开始修改",
+    "每轮任务都有明确的文件范围和验收证据",
+    "Agent 先复述计划，未确认的扩展没有被执行",
+    "npm test 和 npm run dev 都已完成",
+    "我亲自阅读了最终 Diff，并核对删除、合并和顺序变化"
   ]}
 />

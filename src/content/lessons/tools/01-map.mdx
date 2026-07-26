@@ -69,22 +69,24 @@ import Checklist from "../../../components/Checklist.astro";
 | 层 | 回答的问题 | 例子 |
 | --- | --- | --- |
 | 模型 | 谁负责理解与生成？ | Claude、GPT、Gemini、DeepSeek、GLM、Kimi |
-| Agent / Harness | 谁组织上下文、调用工具、循环执行？ | OpenCode、Claude Code、Codex CLI |
+| Agent / Harness | 谁组织上下文、调用工具、循环执行？ | OpenCode、Claude Code、Codex CLI、Kimi Code CLI |
 | Skill | 如何把上下文、步骤和验收标准封装成可复用能力？ | `SKILL.md`、团队工作流、项目规范 |
 
 同一个模型放进不同 Agent，使用体验和安全边界可能完全不同；同一个 Agent 连接不同模型，能力、速度和成本也会变化；Skill 则决定团队经验能否稳定复用。后面的课程会把模型选择落实为 `VIBE_BASE_URL`、`VIBE_API_KEY` 和 `<MODEL_ID>`，而不是把密钥写进仓库。
+
+MCP 与 Subagent 不是第四、第五种模型层。**MCP 位于 Agent 的工具连接边界**，让它访问外部工具和数据；**Subagent 位于 Agent 的任务编排内部**，让主 Agent 把一部分工作交给独立上下文处理。工具介绍为它们分别安排了 [Agent 与 Subagent](/vibe_coding_guide/tools/agent-subagents/)和 [MCP](/vibe_coding_guide/tools/mcp/)独立章节。
 
 ## 两种常见工具形态
 
 ### 编辑器型：看得见、改得近
 
-Cursor、GitHub Copilot 等把聊天、补全和多文件修改放在编辑器中。优点是文件、Diff 和诊断信息都在熟悉的界面里；缺点是产品通常与特定编辑器生态、账号体系或云服务绑定。
+Visual Studio Code + GitHub Copilot、Cursor 与 TRAE 把聊天、补全和多文件修改放在编辑器中。优点是文件、Diff 和诊断信息都在熟悉的界面里；缺点是产品通常与特定编辑器生态、账号体系或云服务绑定。
 
 适合：已经习惯图形化 IDE、需要频繁手工调整代码的人。
 
 ### 终端型：组合自由、离工程最近
 
-OpenCode、Claude Code、Codex CLI、Gemini CLI 直接在项目终端工作。它们天然能够使用 Git、测试命令和脚本，也更容易接入企业模型 API。
+OpenCode、Claude Code、Codex CLI 与 Kimi Code CLI 直接在项目终端工作。它们天然能够使用 Git、测试命令和脚本；其中 OpenCode 还能连接企业提供的 OpenAI-compatible 模型 API。
 
 适合：Linux 环境、模型需要替换、希望把工作流写成脚本或规则的团队。
 
